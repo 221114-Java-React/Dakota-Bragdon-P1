@@ -1,7 +1,8 @@
 package com.revature.ticketer.handlers;
 
+import com.revature.ticketer.TicketStatusService.UserService;
+
 import io.javalin.http.Context;
-import com.revature.ticketer.services.UserService;
 
 /*
  * Userhandler class will handle http verbs and endpoints

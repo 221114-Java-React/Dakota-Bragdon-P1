@@ -1,4 +1,4 @@
-package com.revature.ticketer.services;
+package com.revature.ticketer.TicketStatusService;
 
 import com.revature.ticketer.daos.TicketDAO;
 

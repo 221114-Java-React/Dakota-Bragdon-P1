@@ -1,6 +1,6 @@
 package com.revature.ticketer.handlers;
 
-import com.revature.ticketer.services.TicketService;
+import com.revature.ticketer.TicketStatusService.TicketService;
 
 public class TicketHandler {
     
