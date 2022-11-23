@@ -13,9 +13,9 @@ public interface TemplateDAO<T>{
      * TicketDAO and UserDAO from here
      */
 
-    void save();
-    void delete();
-    void update();
+    void save(T obj);
+    void delete(T obj);
+    void update(T obj);
     List<T> findAll();
     T findById();
 }

@@ -8,7 +8,7 @@ import com.revature.ticketer.models.Ticket;
 public class TicketDAO implements TemplateDAO<Ticket>{
 
     @Override
-    public void delete() {
+    public void delete(Ticket obj) {
         
     }
 
@@ -23,13 +23,15 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     }
 
     @Override
-    public void save() {
+    public void save(Ticket obj) {
         
     }
 
     @Override
-    public void update() {
+    public void update(Ticket obj) {
         
     }
+
+
     
 }

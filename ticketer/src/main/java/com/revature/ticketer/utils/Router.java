@@ -32,7 +32,8 @@ public class Router {
         TicketService ticketService = new TicketService(ticketDAO);
         TicketHandler ticketHandler = new TicketHandler(ticketService);
 
-        //Handler Groups
+        //User Handler Group
+        //Goes Routes, userHandler, userService, userDAO
         app.routes(() -> {
             path("/users", () -> {
                 //Post takes in a context which points to a function body
