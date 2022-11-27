@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /*
- * Bridges the DAO classes with the db
+ * Bridges the DAO classes with the database
  * Singleton design pattern (prevents multiple connections
  * at the same time since that may cause issues)
  */
@@ -28,13 +28,13 @@ public class ConnectionFactory {
         }
     }
 
-    //Need a class to read the properties file
+    //This class reads the properties file. Ensures the right database is selected
     private final Properties props = new Properties();
 
     private ConnectionFactory(){
         //Attempts to open the dp.properties
         try {
-            props.load(new FileReader("src/main/resources/db.properties"));
+            props.load(new FileReader("ticketer/src/main/resources/db.properties"));
         } catch (IOException e){
             e.printStackTrace();
         }

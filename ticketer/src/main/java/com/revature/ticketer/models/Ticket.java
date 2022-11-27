@@ -8,6 +8,7 @@ import com.revature.ticketer.Exceptions.InvalidInputException;
  * So consider changing this in the future
  */
 public class Ticket {
+    private String id;
     private double amount;
     private String description;
     Status ticketStatus;

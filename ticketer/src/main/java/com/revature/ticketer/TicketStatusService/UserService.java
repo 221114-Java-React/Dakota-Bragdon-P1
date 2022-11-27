@@ -30,9 +30,9 @@ public class UserService {
 
         if(!isValidUsername(request.getUsername())) throw new InvalidUserException("ERROR: Username must be 8-20 characters long");
         if(usernames.contains(request.getUsername())) throw new InvalidUserException("ERROR: Username already exists");
-        if(!isValidUsername(request.getPassword1())) throw new InvalidUserException("ERROR: Passwords must be a minimum of 8" + 
+        if(!isValidPassword(request.getPassword1())) throw new InvalidUserException("ERROR: Passwords must be a minimum of 8 " + 
         "characters, with at least one letter, one number, and one special character");
-        if(request.getPassword1()!=request.getPassword2()) throw new InvalidUserException("ERROR: Passwords do not match");
+        if(!request.getPassword1().equals(request.getPassword2())) throw new InvalidUserException("ERROR: Passwords do not match");
 
         //Creates a new user using the DTO request UUID.randomUUID generates a random id for user
         User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), 

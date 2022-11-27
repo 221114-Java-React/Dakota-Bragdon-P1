@@ -20,7 +20,21 @@ public class UserDAO implements TemplateDAO<User>{
 
     @Override
     public List<User> findAll() {
-        return null;
+        List<User> users = new ArrayList<>();
+        try(Connection con = ConnectionFactory.getInstance().getConnection()) {
+            //prepares an SQL command
+            PreparedStatement ps = con.prepareStatement("SELECT * from users");
+            ResultSet rs = ps.executeQuery();
+
+            //CURRENTLY AN INFINITE WHILE LOOP. PROPERLY FIX THIS BY CORRECTLY ADDING LATER
+            while(rs.next()){
+                //user currentUser = new User(rs.getString());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
     }
 
     @Override
