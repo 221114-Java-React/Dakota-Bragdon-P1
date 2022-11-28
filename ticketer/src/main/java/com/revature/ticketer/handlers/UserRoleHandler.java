@@ -1,5 +1,5 @@
 package com.revature.ticketer.handlers;
 
-public class UserRoleRequest {
+public class UserRoleHandler {
     
 }

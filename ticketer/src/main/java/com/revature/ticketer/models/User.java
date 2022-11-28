@@ -7,8 +7,8 @@ public class User {
     private String password;
     private String givenName;
     private String surname;
-    boolean isActive;
-    private String role; //May be changed to an enum in the future
+    private boolean isActive;
+    private Role role;
     
 
     public User(){
@@ -16,7 +16,7 @@ public class User {
     }
 
     public User(String id, String username, String email, String password, 
-        String givenName, String surname, boolean isActive, String role) {
+        String givenName, String surname, boolean isActive, Role role) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -51,11 +51,11 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

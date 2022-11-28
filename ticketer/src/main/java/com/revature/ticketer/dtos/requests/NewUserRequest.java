@@ -8,21 +8,20 @@ public class NewUserRequest{
     private String password2;
     private String givenName;
     private String surname;
-    private boolean isActive;
 
     public NewUserRequest(){
         super();
     }
 
+    //Will prompt the user for these things. Consider removing isActive since that should be updated automatically
     public NewUserRequest(String username, String email, String password1, String password2, String givenName,
-            String surname, boolean isActive) {
+            String surname) {
         this.username = username;
         this.email = email;
         this.password1 = password1;
         this.password2 = password2;
         this.givenName = givenName;
         this.surname = surname;
-        this.isActive = isActive;
     }
 
     public String getUsername() {
@@ -49,11 +48,6 @@ public class NewUserRequest{
         this.password2 = password2;
     }
 
-    @Override
-    public String toString() {
-        return "NewUserRequest{username=" + username + ", password1=" + password1 + ", password2=" + password2 + "}";
-    }
-
     public String getEmail() {
         return email;
     }
@@ -78,13 +72,8 @@ public class NewUserRequest{
         this.surname = surname;
     }
 
-    public boolean isActive() {
-        return isActive;
+    @Override
+    public String toString() {
+        return "NewUserRequest{username=" + username + ", password1=" + password1 + ", password2=" + password2 + "}";
     }
-
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    
 }

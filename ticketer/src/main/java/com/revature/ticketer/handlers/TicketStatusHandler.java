@@ -1,5 +1,5 @@
 package com.revature.ticketer.handlers;
 
-public class TicketStatusRequest {
+public class TicketStatusHandler {
     
 }

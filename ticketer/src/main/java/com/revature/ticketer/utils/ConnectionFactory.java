@@ -34,7 +34,7 @@ public class ConnectionFactory {
     private ConnectionFactory(){
         //Attempts to open the dp.properties
         try {
-            props.load(new FileReader("ticketer/src/main/resources/db.properties"));
+            props.load(new FileReader("src/main/resources/db.properties"));
         } catch (IOException e){
             e.printStackTrace();
         }

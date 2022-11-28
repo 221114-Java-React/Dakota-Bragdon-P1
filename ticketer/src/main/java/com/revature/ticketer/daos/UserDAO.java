@@ -50,7 +50,8 @@ public class UserDAO implements TemplateDAO<User>{
             //Prepares some string/input to be stored within a database
             //ALWAYS START WITH A PREPARED STATEMENT
             PreparedStatement ps = con.prepareStatement("INSERT INTO users (id, username, email, password,"
-                + " given_name, surname, is_active, role_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                + " given_name, surname, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            //    + "SELECT role FROM user_roles WHERE role = 'EMPLOYEE'");
             //Interpolation which puts values inside of columns
             ps.setString(1, obj.getId());
             ps.setString(2, obj.getUsername());
@@ -59,7 +60,10 @@ public class UserDAO implements TemplateDAO<User>{
             ps.setString(5, obj.getGivenName());
             ps.setString(6, obj.getSurname());
             ps.setBoolean(7, obj.isActive());
-            ps.setString(8, obj.getRole());
+            //THE FOLLOWING LINE IS PROBLEMATIC. WILL NEED TO SET A REFERENCE TO THE USER_ROLES TABLE
+            //Will most likely require a modification to the PreparedStatement that selects the corresponding role from the table
+            //This may also require me to prepopulate the user_roles table with the corresponding values
+            //ps.setString(8, obj.getRole().toString());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

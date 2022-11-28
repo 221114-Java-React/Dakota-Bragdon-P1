@@ -4,12 +4,12 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revature.ticketer.TicketStatusService.TicketService;
-import com.revature.ticketer.TicketStatusService.UserService;
 import com.revature.ticketer.daos.TicketDAO;
 import com.revature.ticketer.daos.UserDAO;
 import com.revature.ticketer.handlers.TicketHandler;
 import com.revature.ticketer.handlers.UserHandler;
+import com.revature.ticketer.services.TicketService;
+import com.revature.ticketer.services.UserService;
 
 import io.javalin.Javalin;
 

@@ -1,4 +1,4 @@
-package com.revature.ticketer.TicketStatusService;
+package com.revature.ticketer.services;
 
 import java.util.List;
 import java.util.UUID;
@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.daos.UserDAO;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
+import com.revature.ticketer.models.Role;
 import com.revature.ticketer.models.User;
 
 /*
@@ -28,6 +29,7 @@ public class UserService {
     public void saveUser(NewUserRequest request){
         List<String> usernames = userDAO.findAllUsernames();
 
+        //Used to ensure username, email, and password are all valid
         if(!isValidUsername(request.getUsername())) throw new InvalidUserException("ERROR: Username must be 8-20 characters long");
         if(usernames.contains(request.getUsername())) throw new InvalidUserException("ERROR: Username already exists");
         if(!isValidPassword(request.getPassword1())) throw new InvalidUserException("ERROR: Passwords must be a minimum of 8 " + 
@@ -38,7 +40,7 @@ public class UserService {
         //Creates a new user using the DTO request UUID.randomUUID generates a random id for user
         //User will be given the Default role of Employee, and isActive
         User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), request.getEmail(),
-            request.getPassword1(), request.getGivenName(), request.getSurname(), true , "DEFAULT");
+            request.getPassword1(), request.getGivenName(), request.getSurname(), true , Role.EMPLOYEE);
         userDAO.save(createdUser);
     }
 

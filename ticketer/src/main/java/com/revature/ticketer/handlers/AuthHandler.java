@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revature.ticketer.TicketStatusService.UserService;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
 import com.revature.ticketer.models.User;
+import com.revature.ticketer.services.UserService;
 
 import io.javalin.http.Context;
 

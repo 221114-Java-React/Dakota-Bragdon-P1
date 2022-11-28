@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidUserException;
-import com.revature.ticketer.TicketStatusService.UserService;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
+import com.revature.ticketer.services.UserService;
 
 import io.javalin.http.Context;
 
@@ -27,7 +27,7 @@ public class UserHandler {
         NewUserRequest req = mapper.readValue(c.req.getInputStream(), NewUserRequest.class);
         try{
             userService.saveUser(req);
-            c.status(201); //Created Status Code. Implied a new user has been created
+            c.status(201); //Created Status Code. Implies that a new user has been created
         } catch (InvalidUserException e){
             c.status(409); //Conflict Status Code, meaning the user already exists
             //Maybe have a child class for this exception so it is a little bit more specific and useful for logging
