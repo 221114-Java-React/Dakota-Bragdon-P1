@@ -1,5 +1,8 @@
 package com.revature.ticketer.models;
 
-public class Type {
-    //enum type{} TO BE DETERMINED
+public enum Type {
+    LODGING,
+    TRAVEL,
+    FOOD,
+    OTHER
 }

@@ -1,9 +1,7 @@
 package com.revature.ticketer.models;
 
-public class Status {
-    enum status{
-        PENDING,
-        APPROVED,
-        DENIED
-    }
+public enum Status {
+    PENDING,
+    APPROVED,
+    DENIED
 }

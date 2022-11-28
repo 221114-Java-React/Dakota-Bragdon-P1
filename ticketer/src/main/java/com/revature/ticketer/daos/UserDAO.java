@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revature.ticketer.models.Role;
 import com.revature.ticketer.models.User;
 import com.revature.ticketer.utils.ConnectionFactory;
 
@@ -28,8 +29,10 @@ public class UserDAO implements TemplateDAO<User>{
 
             //CURRENTLY AN INFINITE WHILE LOOP. PROPERLY FIX THIS BY CORRECTLY ADDING LATER
             while(rs.next()){
-                //user currentUser = new User(rs.getString());
-                //
+                User currentUser = new User(rs.getString("id"), rs.getString("username"), rs.getString("email"),
+                rs.getString("password"), rs.getString("given_name"), rs.getString("surname"),
+                rs.getBoolean("is_active"), rs.getString("role_id"));
+                users.add(currentUser);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -49,9 +52,9 @@ public class UserDAO implements TemplateDAO<User>{
         try(Connection con = ConnectionFactory.getInstance().getConnection()) {
             //Prepares some string/input to be stored within a database
             //ALWAYS START WITH A PREPARED STATEMENT
+            //Currently the PreparedStatement or database is giving me issues
             PreparedStatement ps = con.prepareStatement("INSERT INTO users (id, username, email, password,"
-                + " given_name, surname, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            //    + "SELECT role FROM user_roles WHERE role = 'EMPLOYEE'");
+                + " given_name, surname, is_active, role_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             //Interpolation which puts values inside of columns
             ps.setString(1, obj.getId());
             ps.setString(2, obj.getUsername());
@@ -60,10 +63,7 @@ public class UserDAO implements TemplateDAO<User>{
             ps.setString(5, obj.getGivenName());
             ps.setString(6, obj.getSurname());
             ps.setBoolean(7, obj.isActive());
-            //THE FOLLOWING LINE IS PROBLEMATIC. WILL NEED TO SET A REFERENCE TO THE USER_ROLES TABLE
-            //Will most likely require a modification to the PreparedStatement that selects the corresponding role from the table
-            //This may also require me to prepopulate the user_roles table with the corresponding values
-            //ps.setString(8, obj.getRole().toString());
+            ps.setString(8, obj.getRole_id());//fix this
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -95,5 +95,11 @@ public class UserDAO implements TemplateDAO<User>{
 
         return usernames;
     }
-    
+
+
+    /* return role_id by role -> (EMPLOYEE, FINANCE MANAGER, etc) */
+    public String getRoleIdByRole(String role) {
+        //ADD A QUERY PREPARED STATEMENT TO DO THIS
+        return "";
+    }
 }

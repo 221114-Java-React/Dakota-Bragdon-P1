@@ -40,7 +40,7 @@ public class UserService {
         //Creates a new user using the DTO request UUID.randomUUID generates a random id for user
         //User will be given the Default role of Employee, and isActive
         User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), request.getEmail(),
-            request.getPassword1(), request.getGivenName(), request.getSurname(), true , Role.EMPLOYEE);
+            request.getPassword1(), request.getGivenName(), request.getSurname(), true , "e58ed763-928c-4155-bee9-fdbaaadc15f3");
         userDAO.save(createdUser);
     }
 
