@@ -3,17 +3,27 @@ package com.revature.ticketer.models;
 public class User {
     private String id;
     private String username;
+    private String email;
     private String password;
+    private String givenName;
+    private String surname;
+    boolean isActive;
     private String role; //May be changed to an enum in the future
+    
 
     public User(){
         super();
     }
 
-    public User(String id, String username, String password, String role) {
+    public User(String id, String username, String email, String password, 
+        String givenName, String surname, boolean isActive, String role) {
         this.id = id;
         this.username = username;
+        this.email = email;
         this.password = password;
+        this.givenName = givenName;
+        this.surname = surname;
+        this.isActive = isActive;
         this.role = role;
     }
 
@@ -47,6 +57,38 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getGivenName() {
+        return givenName;
+    }
+
+    public void setGivenName(String givenName) {
+        this.givenName = givenName;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     @Override

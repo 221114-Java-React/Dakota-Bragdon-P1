@@ -33,10 +33,12 @@ public class UserService {
         if(!isValidPassword(request.getPassword1())) throw new InvalidUserException("ERROR: Passwords must be a minimum of 8 " + 
         "characters, with at least one letter, one number, and one special character");
         if(!request.getPassword1().equals(request.getPassword2())) throw new InvalidUserException("ERROR: Passwords do not match");
+        if(!isValidEmail(request.getEmail())) throw new InvalidUserException("ERROR: Invalid email");
 
         //Creates a new user using the DTO request UUID.randomUUID generates a random id for user
-        User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), 
-            request.getPassword1(), "DEFAULT");
+        //User will be given the Default role of Employee, and isActive
+        User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), request.getEmail(),
+            request.getPassword1(), request.getGivenName(), request.getSurname(), true , "DEFAULT");
         userDAO.save(createdUser);
     }
 
@@ -51,5 +53,10 @@ public class UserService {
         //Checks to see if password is valid. Minimum of 8 characters, 1 letter, 1 num, 1 special char
         //added an extra \ before the d's because of a compiler issue
         return password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$");
+    }
+
+    //Checks to see if the email is valid
+    private boolean isValidEmail(String email){
+        return email.matches("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
     }
 }

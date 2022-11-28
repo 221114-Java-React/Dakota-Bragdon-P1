@@ -1,5 +1,5 @@
 package com.revature.ticketer.dtos.requests;
 
-public class NewTicketTypeHandler {
+public class NewTicketTypeRequest {
     
 }

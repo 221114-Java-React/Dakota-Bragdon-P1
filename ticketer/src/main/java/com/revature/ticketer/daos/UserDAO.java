@@ -29,6 +29,7 @@ public class UserDAO implements TemplateDAO<User>{
             //CURRENTLY AN INFINITE WHILE LOOP. PROPERLY FIX THIS BY CORRECTLY ADDING LATER
             while(rs.next()){
                 //user currentUser = new User(rs.getString());
+                //
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,13 +49,17 @@ public class UserDAO implements TemplateDAO<User>{
         try(Connection con = ConnectionFactory.getInstance().getConnection()) {
             //Prepares some string/input to be stored within a database
             //ALWAYS START WITH A PREPARED STATEMENT
-            PreparedStatement ps = con.prepareStatement("INSERT INTO users (id, username, password, role) " + 
-                "VALUES (?, ?, ?, ?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO users (id, username, email, password,"
+                + " given_name, surname, is_active, role_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             //Interpolation which puts values inside of columns
-            ps.setString(1, obj.getId());//Saves id
-            ps.setString(2, obj.getUsername());//Saves username ...
-            ps.setString(3, obj.getPassword());
-            ps.setString(4, obj.getRole());
+            ps.setString(1, obj.getId());
+            ps.setString(2, obj.getUsername());
+            ps.setString(3, obj.getEmail());
+            ps.setString(4, obj.getPassword());
+            ps.setString(5, obj.getGivenName());
+            ps.setString(6, obj.getSurname());
+            ps.setBoolean(7, obj.isActive());
+            ps.setString(8, obj.getRole());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
