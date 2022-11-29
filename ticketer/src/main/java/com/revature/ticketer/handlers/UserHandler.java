@@ -27,6 +27,7 @@ public class UserHandler {
         NewUserRequest req = mapper.readValue(c.req.getInputStream(), NewUserRequest.class);
         try{
             userService.saveUser(req);
+            System.out.println("USER HANDLER SHOULD PRINT OUT STATUS CODE 201");
             c.status(201); //Created Status Code. Implies that a new user has been created
         } catch (InvalidUserException e){
             c.status(409); //Conflict Status Code, meaning the user already exists

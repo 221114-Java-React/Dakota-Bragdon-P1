@@ -1,7 +1,5 @@
 package com.revature.ticketer.models;
 
-public enum Status {
-    PENDING,
-    APPROVED,
-    DENIED
+public class Status {
+    //May completely remove this if not necessary
 }

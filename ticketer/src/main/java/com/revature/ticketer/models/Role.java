@@ -1,7 +1,5 @@
 package com.revature.ticketer.models;
 
-public enum Role {
-    EMPLOYEE,
-    MANAGER,
-    ADMIN
+public class Role {
+    //May completely remove this if not necessary
 }

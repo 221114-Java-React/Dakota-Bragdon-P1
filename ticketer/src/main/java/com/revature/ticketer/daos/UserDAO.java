@@ -63,7 +63,7 @@ public class UserDAO implements TemplateDAO<User>{
             ps.setString(5, obj.getGivenName());
             ps.setString(6, obj.getSurname());
             ps.setBoolean(7, obj.isActive());
-            ps.setString(8, obj.getRole_id());//fix this
+            ps.setString(8, obj.getRole_id());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -94,6 +94,25 @@ public class UserDAO implements TemplateDAO<User>{
         }
 
         return usernames;
+    }
+
+    //Returns a list of all emails currently within the database
+    public List<String> findAllEmails(){
+        List<String> emails = new ArrayList<>();
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT (email) from users");
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                String currentEmail = rs.getString("email");
+                emails.add(currentEmail);
+            }
+
+        } catch (SQLException e) {
+                e.printStackTrace();
+        }
+
+        return emails;
     }
 
 
