@@ -24,10 +24,11 @@ public class UserHandler {
 
     public void signup(Context c) throws IOException{
         //Returns the JSON request and maps it to NewUserRequest
+        //This JSON request is the POST request made
         NewUserRequest req = mapper.readValue(c.req.getInputStream(), NewUserRequest.class);
+        //Attempts to save the new user to the database
         try{
             userService.saveUser(req);
-            System.out.println("USER HANDLER SHOULD PRINT OUT STATUS CODE 201");
             c.status(201); //Created Status Code. Implies that a new user has been created
         } catch (InvalidUserException e){
             c.status(409); //Conflict Status Code, meaning the user already exists

@@ -37,6 +37,8 @@ public class Router {
 
         //User Handler Group
         //Goes Routes, userHandler, userService, userDAO
+        //A POST request would be an attempt at making a new user in this path. This is why userHandler's
+        //signup is called on c, which would be the passed data
         app.routes(() -> {
             //User
             path("/users", () -> {

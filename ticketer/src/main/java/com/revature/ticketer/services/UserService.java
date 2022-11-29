@@ -14,6 +14,9 @@ import com.revature.ticketer.models.User;
  * Service class is essentially an API
  * Service class is an example of Dependency Injection
  * since it relies on UserDAO to function
+ * RECALL THE SERVER ANALOGY; A service class
+ * ensures data is in an acceptable form prior to passing it to the
+ * DAO which will perform under the assumption data has been validated
  */
 public class UserService {
     private final UserDAO userDAO;
@@ -31,6 +34,7 @@ public class UserService {
         List<String> emails = userDAO.findAllEmails();
 
         //Used to ensure username, email, and password are all valid
+        //SPLIT THIS UP SO UNIT TESTING CAN BE PERFORMED (Also it's an eye sore)
         if(!isValidUsername(request.getUsername())) throw new InvalidUserException("ERROR: Username must be 8-20 characters long");
         if(usernames.contains(request.getUsername())) throw new InvalidUserException("ERROR: Username already exists");
         if(!isValidPassword(request.getPassword1())) throw new InvalidUserException("ERROR: Passwords must be a minimum of 8 " + 
