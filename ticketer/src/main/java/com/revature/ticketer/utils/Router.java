@@ -6,6 +6,7 @@ import static io.javalin.apibuilder.ApiBuilder.post;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.daos.TicketDAO;
 import com.revature.ticketer.daos.UserDAO;
+import com.revature.ticketer.handlers.AuthHandler;
 import com.revature.ticketer.handlers.TicketHandler;
 import com.revature.ticketer.handlers.UserHandler;
 import com.revature.ticketer.services.TicketService;
@@ -30,6 +31,9 @@ public class Router {
         UserService userService = new UserService(userDAO);
         UserHandler userHandler = new UserHandler(userService, mapper);
 
+        //Auth
+        AuthHandler authHandler = new AuthHandler(userService, mapper);
+
         //Tickets
         TicketDAO ticketDAO = new TicketDAO();
         TicketService ticketService = new TicketService(ticketDAO);
@@ -48,6 +52,10 @@ public class Router {
             });
 
             //Auth
+            path("/auth", () ->{
+                post(c -> authHandler.authenticateUser(c));
+                //authHandler::authenticateUser This is an example of method reference and automatically passes the context
+            });
         });
     }
 }

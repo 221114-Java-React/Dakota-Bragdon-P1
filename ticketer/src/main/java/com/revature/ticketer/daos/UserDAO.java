@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revature.ticketer.models.Role;
 import com.revature.ticketer.models.User;
 import com.revature.ticketer.utils.ConnectionFactory;
 
@@ -96,6 +95,26 @@ public class UserDAO implements TemplateDAO<User>{
         return usernames;
     }
 
+    //Checks to see if a User/password combination is in the database
+    public User getUserByUserNameAndPassword(String username, String password){
+        User user = null;
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                user = new User(rs.getString("id"), rs.getString("username"), rs.getString("email"),
+                rs.getString("password"), rs.getString("given_name"), rs.getString("surname"),
+                rs.getBoolean("is_active"), rs.getString("role_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
     //Returns a list of all emails currently within the database
     public List<String> findAllEmails(){
         List<String> emails = new ArrayList<>();
@@ -113,12 +132,5 @@ public class UserDAO implements TemplateDAO<User>{
         }
 
         return emails;
-    }
-
-
-    /* return role_id by role -> (EMPLOYEE, FINANCE MANAGER, etc) */
-    public String getRoleIdByRole(String role) {
-        //ADD A QUERY PREPARED STATEMENT TO DO THIS
-        return "";
     }
 }

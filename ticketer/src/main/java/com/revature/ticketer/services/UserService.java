@@ -3,10 +3,12 @@ package com.revature.ticketer.services;
 import java.util.List;
 import java.util.UUID;
 
+import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.daos.UserDAO;
+import com.revature.ticketer.dtos.requests.NewLoginRequest;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
-import com.revature.ticketer.models.Role;
+import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.User;
 
 /*
@@ -50,6 +52,13 @@ public class UserService {
         userDAO.save(createdUser);
     }
 
+    public Principal login(NewLoginRequest req){
+        User validUser = userDAO.getUserByUserNameAndPassword(req.getUsername(),req.getPassword());
+        if (validUser == null) throw new InvalidAuthException("ERROR: Invalid username or password");
+        //Last spot is blank because we haven't actually generated an authToken yet.
+        return new Principal (validUser.getId(), validUser.getUsername(), validUser.getRole_id());
+    }
+
     //Checks to see if the username is valid
     private boolean isValidUsername(String username) {
         //Checks if the username is 8-20 are removes a lot of special characters
@@ -66,5 +75,10 @@ public class UserService {
     //Checks to see if the email is valid
     private boolean isValidEmail(String email){
         return email.matches("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
+    }
+
+    //Encrypts a user's password prior to storing it on the database
+    private String hashPassword(String password){
+        return "";
     }
 }
