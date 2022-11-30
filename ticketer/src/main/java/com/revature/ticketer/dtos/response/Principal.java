@@ -1,5 +1,9 @@
 package com.revature.ticketer.dtos.response;
 
+/*
+ * This contains all the relevant information for the user. User's don't really need their surname,
+ * given_name, password, email, etc for usage for the app. Only the necessary information will be used
+ */
 public class Principal {
     private String id;
     private String username;

@@ -1,10 +1,19 @@
 package com.revature.ticketer.handlers;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
+import com.revature.ticketer.dtos.response.Principal;
+import com.revature.ticketer.models.User;
+import com.revature.ticketer.services.TokenService;
 import com.revature.ticketer.services.UserService;
 
 import io.javalin.http.Context;
@@ -16,10 +25,15 @@ public class UserHandler {
 
     private final UserService userService;
     private final ObjectMapper mapper;
+    private final TokenService tokenService;
+    private final static Logger logger = LoggerFactory.getLogger(User.class);
      
-    public UserHandler(UserService userService, ObjectMapper mapper) {
+
+
+    public UserHandler(UserService userService, ObjectMapper mapper, TokenService tokenService) {
         this.userService = userService;
         this.mapper = mapper;
+        this.tokenService = tokenService;
     }
 
     public void signup(Context c) throws IOException{
@@ -33,6 +47,23 @@ public class UserHandler {
         } catch (InvalidUserException e){
             c.status(409); //Conflict Status Code, meaning the user already exists
             //Maybe have a child class for this exception so it is a little bit more specific and useful for logging
+            c.json(e);
+        }
+    }
+
+    public void getAllUsers(Context c){
+        try{ 
+            
+            String token = c.req.getHeader("authorization");
+            if(token == null || token.isEmpty()) throw new InvalidAuthException("ERROR: You are not signed in");
+            Principal principal = tokenService.extractRequesterDetails(token);
+            if (principal == null) throw new InvalidAuthException("ERROR: Invalid Token");
+            //CURRENTLY NEED TO MANUALLY UPDATE THE AUTHORIZATION FIELD IN THE GET REQUEST FOR ALL USERS!
+            if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
+            List<User> users = userService.getAllUsers();
+            c.json(users);
+        } catch (InvalidAuthException e){
+            c.status(401);
             c.json(e);
         }
     }

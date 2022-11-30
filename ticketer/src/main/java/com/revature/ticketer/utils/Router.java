@@ -2,6 +2,7 @@ package com.revature.ticketer.utils;
 
 import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
+import static io.javalin.apibuilder.ApiBuilder.get;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.daos.TicketDAO;
@@ -10,6 +11,7 @@ import com.revature.ticketer.handlers.AuthHandler;
 import com.revature.ticketer.handlers.TicketHandler;
 import com.revature.ticketer.handlers.UserHandler;
 import com.revature.ticketer.services.TicketService;
+import com.revature.ticketer.services.TokenService;
 import com.revature.ticketer.services.UserService;
 
 import io.javalin.Javalin;
@@ -21,6 +23,8 @@ public class Router {
 
     public static void router(Javalin app){
         ObjectMapper mapper = new ObjectMapper();
+        JwtConfig jwtConfig = new JwtConfig();
+        TokenService tokenService = new TokenService(jwtConfig);
 
         /*
          * Hierarchy of dependency injection
@@ -29,10 +33,10 @@ public class Router {
         //Users
         UserDAO userDAO = new UserDAO();
         UserService userService = new UserService(userDAO);
-        UserHandler userHandler = new UserHandler(userService, mapper);
+        UserHandler userHandler = new UserHandler(userService, mapper, tokenService);
 
         //Auth
-        AuthHandler authHandler = new AuthHandler(userService, mapper);
+        AuthHandler authHandler = new AuthHandler(userService, mapper, tokenService);
 
         //Tickets
         TicketDAO ticketDAO = new TicketDAO();
@@ -48,7 +52,9 @@ public class Router {
             path("/users", () -> {
                 //Post takes in a context which points to a function body
                 //Turns a function into a variable
+                get(c -> userHandler.getAllUsers(c));
                 post(c -> userHandler.signup(c));
+
             });
 
             //Auth

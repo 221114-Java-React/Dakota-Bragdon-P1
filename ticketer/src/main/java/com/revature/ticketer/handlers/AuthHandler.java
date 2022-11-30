@@ -10,6 +10,7 @@ import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
 import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.User;
+import com.revature.ticketer.services.TokenService;
 import com.revature.ticketer.services.UserService;
 
 import io.javalin.http.Context;
@@ -22,12 +23,13 @@ import io.javalin.http.Context;
 public class AuthHandler {
     private final UserService userService;
     private final ObjectMapper mapper;
+    private final TokenService tokenService;
     private static final Logger logger = LoggerFactory.getLogger(User.class); //Logger is used to display information while debugging
 
-
-    public AuthHandler(UserService userService, ObjectMapper mapper) {
+    public AuthHandler(UserService userService, ObjectMapper mapper, TokenService tokenService) {
         this.userService = userService;
         this.mapper = mapper;
+        this.tokenService = tokenService;
     }
 
     public void authenticateUser(Context c) throws IOException {
@@ -36,7 +38,17 @@ public class AuthHandler {
         logger.info("Attempting to log in...");
         try{
             Principal principal = userService.login(req);
+
+            //Attempts to generate a token
+            String token = tokenService.generateToken(principal);
+
+            //Sets header with an auth token
+            c.res.setHeader("authorization", token);
+            //Returns the principal as a json
+            c.json(principal);
+
             logger.info("Log in successful");
+            c.status(202);
         } catch (InvalidAuthException e){
             c.status(401); //Invalid Authorization status code
             c.json(e);

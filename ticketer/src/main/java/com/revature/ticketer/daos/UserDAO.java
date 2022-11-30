@@ -26,7 +26,6 @@ public class UserDAO implements TemplateDAO<User>{
             PreparedStatement ps = con.prepareStatement("SELECT * from users");
             ResultSet rs = ps.executeQuery();
 
-            //CURRENTLY AN INFINITE WHILE LOOP. PROPERLY FIX THIS BY CORRECTLY ADDING LATER
             while(rs.next()){
                 User currentUser = new User(rs.getString("id"), rs.getString("username"), rs.getString("email"),
                 rs.getString("password"), rs.getString("given_name"), rs.getString("surname"),
