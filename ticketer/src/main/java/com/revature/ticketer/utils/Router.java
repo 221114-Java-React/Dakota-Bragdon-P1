@@ -53,6 +53,7 @@ public class Router {
                 //Post takes in a context which points to a function body
                 //Turns a function into a variable
                 get(c -> userHandler.getAllUsers(c));
+                get("/name", c -> userHandler.getAllUsersByUsername(c));
                 post(c -> userHandler.signup(c));
 
             });

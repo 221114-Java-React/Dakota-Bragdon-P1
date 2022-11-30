@@ -23,7 +23,28 @@ public class UserDAO implements TemplateDAO<User>{
         List<User> users = new ArrayList<>();
         try(Connection con = ConnectionFactory.getInstance().getConnection()) {
             //prepares an SQL command
-            PreparedStatement ps = con.prepareStatement("SELECT * from users");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM users");
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                User currentUser = new User(rs.getString("id"), rs.getString("username"), rs.getString("email"),
+                rs.getString("password"), rs.getString("given_name"), rs.getString("surname"),
+                rs.getBoolean("is_active"), rs.getString("role_id"));
+                users.add(currentUser);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
+    public List<User> findUsersByUsername(String username){
+        List<User> users = new ArrayList<>();
+        try(Connection con = ConnectionFactory.getInstance().getConnection()){
+            //Returns a list of usernames similar to username parameter
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM users WHERE username LIKE ?");
+            ps.setString(1,username + "%");
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
@@ -78,7 +99,7 @@ public class UserDAO implements TemplateDAO<User>{
         List<String> usernames = new ArrayList<>();
         try(Connection con = ConnectionFactory.getInstance().getConnection()) {
             //prepares an SQL command
-            PreparedStatement ps = con.prepareStatement("SELECT (username) from users");
+            PreparedStatement ps = con.prepareStatement("SELECT (username) FROM users");
             ResultSet rs = ps.executeQuery();
 
             //This set of data is basically just a row
@@ -95,7 +116,7 @@ public class UserDAO implements TemplateDAO<User>{
     }
 
     //Checks to see if a User/password combination is in the database
-    public User getUserByUserNameAndPassword(String username, String password){
+    public User findUserByUserNameAndPassword(String username, String password){
         User user = null;
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
             PreparedStatement ps = con.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");

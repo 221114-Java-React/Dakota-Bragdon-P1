@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
+import com.revature.ticketer.Exceptions.InvalidInputException;
 import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
 import com.revature.ticketer.dtos.response.Principal;
@@ -53,14 +54,29 @@ public class UserHandler {
 
     public void getAllUsers(Context c){
         try{ 
-            
-            String token = c.req.getHeader("authorization");
+            String token = c.req.getHeader("authorization");//Generates String token from the Header of the Post Request
             if(token == null || token.isEmpty()) throw new InvalidAuthException("ERROR: You are not signed in");
             Principal principal = tokenService.extractRequesterDetails(token);
             if (principal == null) throw new InvalidAuthException("ERROR: Invalid Token");
             //CURRENTLY NEED TO MANUALLY UPDATE THE AUTHORIZATION FIELD IN THE GET REQUEST FOR ALL USERS!
             if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
             List<User> users = userService.getAllUsers();
+            c.json(users);
+        } catch (InvalidAuthException e){
+            c.status(401);
+            c.json(e);
+        }
+    }
+
+    public void getAllUsersByUsername(Context c){
+        try{
+            String username = c.req.getParameter("username");
+            String token = c.req.getHeader("authorization"); 
+            if(token == null || token.isEmpty()) throw new InvalidAuthException("ERROR: You are not signed in");
+            if(username == null || username.isEmpty()) throw new InvalidInputException("ERROR: Invalid Input");//Prevents possible issues with a blank username
+            Principal principal = tokenService.extractRequesterDetails(token);
+            if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
+            List<User> users = userService.getAllUsersByUsername(username);
             c.json(users);
         } catch (InvalidAuthException e){
             c.status(401);

@@ -53,7 +53,7 @@ public class UserService {
     }
 
     public Principal login(NewLoginRequest req){
-        User validUser = userDAO.getUserByUserNameAndPassword(req.getUsername(),req.getPassword());
+        User validUser = userDAO.findUserByUserNameAndPassword(req.getUsername(),req.getPassword());
         if (validUser == null) throw new InvalidAuthException("ERROR: Invalid username or password");
         //Last spot is blank because we haven't actually generated an authToken yet.
         return new Principal (validUser.getId(), validUser.getUsername(), validUser.getRole_id());
@@ -84,5 +84,9 @@ public class UserService {
 
     public List<User> getAllUsers(){
         return userDAO.findAll();
+    }
+
+    public List<User> getAllUsersByUsername(String username){
+        return userDAO.findUsersByUsername(username);
     }
 }
