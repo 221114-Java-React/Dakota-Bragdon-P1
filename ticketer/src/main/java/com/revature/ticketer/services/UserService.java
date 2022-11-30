@@ -43,6 +43,7 @@ public class UserService {
         "characters, with at least one letter, one number, and one special character");
         if(!request.getPassword1().equals(request.getPassword2())) throw new InvalidUserException("ERROR: Passwords do not match");
         if(!isValidEmail(request.getEmail())) throw new InvalidUserException("ERROR: Invalid email");
+        
         if(emails.contains(request.getEmail())) throw new InvalidUserException("ERROR: Email is already used");
 
         //Creates a new user using the DTO request UUID.randomUUID generates a random id for user

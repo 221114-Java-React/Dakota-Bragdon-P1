@@ -1,37 +1,57 @@
 package com.revature.ticketer.models;
 
-import com.revature.ticketer.Exceptions.InvalidInputException;
+import java.sql.Timestamp;
+
+import javax.sql.rowset.serial.SerialBlob;
 
 /*
  * Contains all necessary ticket information
- * These amounts may only be read only after being submitted
- * So consider changing this in the future
  */
 public class Ticket {
     private String id;
     private double amount;
+    private Timestamp sumbittedTime;
+    private Timestamp resolveTime;
     private String description;
-    Status ticketStatus;
-
-    enum Status{
-        Pending,
-        Rejected,
-        Approved
+    private SerialBlob receipt;
+    private String paymentId;
+    private String authorId;
+    private String resolverId;
+    private String status;
+    private String type;
+    
+    public Ticket(){
+        super();
     }
 
-    private String type;//Convert this into type when
-                        //the types are decided
-    
-    /*
-     * Creates a Ticket.
-     */
-    public Ticket(int amount, String description, String type) throws InvalidInputException{
-        if(amount <= 0 || description.equals("")) throw new InvalidInputException("ERROR: Invalid Input Detected");
+    public Ticket(String id, double amount, Timestamp sumbittedTime, Timestamp resolveTime, String description,
+            String paymentId, String authorId, String resolverId, String status, String type, SerialBlob receipt) {
+        this.id = id;
         this.amount = amount;
+        this.sumbittedTime = sumbittedTime;
+        this.resolveTime = resolveTime;
         this.description = description;
-        ticketStatus = Status.Pending;
+        this.receipt = receipt;
+        this.paymentId = paymentId;
+        this.authorId = authorId;
+        this.resolverId = resolverId;
+        this.status = status;
         this.type = type;
+    }
 
+
+    public Ticket(String id, double amount, Timestamp sumbittedTime, Timestamp resolveTime, String description,
+            String paymentId, String authorId, String resolverId, String status, String type) {
+        this.id = id;
+        this.amount = amount;
+        this.sumbittedTime = sumbittedTime;
+        this.resolveTime = resolveTime;
+        this.description = description;
+        this.paymentId = paymentId;
+        this.authorId = authorId;
+        this.resolverId = resolverId;
+        this.status = status;
+        this.type = type;
     }
 
     public String getId() {
@@ -50,6 +70,22 @@ public class Ticket {
         this.amount = amount;
     }
 
+    public Timestamp getSumbittedTime() {
+        return sumbittedTime;
+    }
+
+    public void setSumbittedTime(Timestamp sumbittedTime) {
+        this.sumbittedTime = sumbittedTime;
+    }
+
+    public Timestamp getResolveTime() {
+        return resolveTime;
+    }
+
+    public void setResolveTime(Timestamp resolveTime) {
+        this.resolveTime = resolveTime;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -58,12 +94,44 @@ public class Ticket {
         this.description = description;
     }
 
-    public Status getTicketStatus() {
-        return ticketStatus;
+    public SerialBlob getReceipt() {
+        return receipt;
     }
 
-    public void setTicketStatus(Status ticketStatus) {
-        this.ticketStatus = ticketStatus;
+    public void setReceipt(SerialBlob receipt) {
+        this.receipt = receipt;
+    }
+
+    public String getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(String paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
+    }
+
+    public String getResolverId() {
+        return resolverId;
+    }
+
+    public void setResolverId(String resolverId) {
+        this.resolverId = resolverId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getType() {
@@ -74,4 +142,7 @@ public class Ticket {
         this.type = type;
     }
 
+    
+
+    
 }

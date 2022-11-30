@@ -8,6 +8,7 @@ public class Principal {
     private String id;
     private String username;
     private String role;
+    //private Boolean isActive;
 
     public Principal(){
         super();

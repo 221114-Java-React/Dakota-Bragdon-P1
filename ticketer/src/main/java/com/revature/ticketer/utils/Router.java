@@ -41,7 +41,7 @@ public class Router {
         //Tickets
         TicketDAO ticketDAO = new TicketDAO();
         TicketService ticketService = new TicketService(ticketDAO);
-        TicketHandler ticketHandler = new TicketHandler(ticketService);
+        TicketHandler ticketHandler = new TicketHandler(ticketService, mapper, tokenService);
 
         //User Handler Group
         //Goes Routes, userHandler, userService, userDAO
@@ -54,15 +54,34 @@ public class Router {
                 //Turns a function into a variable
                 get(c -> userHandler.getAllUsers(c));
                 get("/name", c -> userHandler.getAllUsersByUsername(c));
+                //get("/role", c -> userHandler.getAllUsersByRole(c));//Will return a list of users ordered by role
                 post(c -> userHandler.signup(c));
+                //delete(c - userHandler.removeUser(c)); Will remove a user based on an id
+                path("/manageUsers", () -> { //THIS WILL REQUIRE ADMINISTRATIVE PRIVILEDGES
+                    
+                    //get(c -> userHandler.getPendingUsers(c)); //Will return a list of users who aren't validated yet
+                    //post(c -> userHandler.validateUsers(c)) //
+                });
 
             });
 
             //Auth
             path("/auth", () ->{
-                post(c -> authHandler.authenticateUser(c));
+                post(c -> authHandler.authenticateUser(c)); //Used to log the user in
                 //authHandler::authenticateUser This is an example of method reference and automatically passes the context
+                //delete(c -> userHandler.invalidateUser(c)) //Invalidates a user (sets is_Active to false) [CHECK IF THIS ISN'T ALREADY THE CASE]
+                //put(c -> userHandler.validateUser(c)) //Validates a user (sets is_Active to true) [CHECK IF THIS ISN'T ALREADY THE CASE]
             });
+
+            //Ticket
+            path("/ticket", () -> {
+                post(c -> ticketHandler.makeTicket(c));//Used to make tickets
+                //modify tickets
+                //get("/user" -> ticketHandler.getUserTickets);//Returns an unordered list of tickets. Maybe add additional paths for sorting by type/amount/status (?)
+                //get("/amount", c -> ticketHandler.) //Returns a sorted list of tickets
+                //get("/")
+            });
+
         });
     }
 }
