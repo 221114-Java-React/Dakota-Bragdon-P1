@@ -2,6 +2,7 @@ package com.revature.ticketer.daos;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -55,5 +56,19 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     }
 
 
-    
+    public String getTypeIdByType(String type) {
+        String typeId = "";
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT (id) FROM reimbursement_types WHERE type = ?");
+            ps.setString(1, type);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                typeId = rs.getString("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return typeId;
+    }
 }

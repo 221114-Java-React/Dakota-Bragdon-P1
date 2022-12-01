@@ -20,8 +20,9 @@ public class TicketService {
         long now = System.currentTimeMillis();
         Timestamp makeTime = new Timestamp(now);
         //GET CURRENT USER ID USING TOKEN
+        String typeId = ticketDAO.getTypeIdByType(request.getType());
         Ticket createdTicket = new Ticket(UUID.randomUUID().toString(), request.getAmount(), makeTime, null, 
-        request.getDescription(), null, "1", null, "b0ccfca2-6f8e-11ed-a1eb-0242ac120002", request.getType());
+            request.getDescription(), null, "1", null, "b0ccfca2-6f8e-11ed-a1eb-0242ac120002", typeId);
         ticketDAO.save(createdTicket);
     }
 }

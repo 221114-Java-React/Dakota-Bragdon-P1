@@ -154,4 +154,21 @@ public class UserDAO implements TemplateDAO<User>{
 
         return emails;
     }
+
+    //Allows the user to send input an all caps role, rather than the UUID
+    public String getRoleIdByRole(String role) {
+        String roleId = "";
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT (id) FROM user_roles WHERE role = ?");
+            ps.setString(1, role);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                roleId = rs.getString("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return roleId;
+    }
 }

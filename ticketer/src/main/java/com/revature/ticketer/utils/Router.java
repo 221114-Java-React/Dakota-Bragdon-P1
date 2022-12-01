@@ -62,6 +62,8 @@ public class Router {
                     
                     //get(c -> userHandler.getPendingUsers(c)); //Will return a list of users who aren't validated yet
                     //post(c -> userHandler.validateUsers(c)) //
+
+                    //Try patching/putting the password
                 });
 
             });

@@ -48,12 +48,16 @@ public class UserService {
         
         if(emails.contains(request.getEmail())) throw new InvalidUserException("ERROR: Email is already used");
 
+        String roleId = userDAO.getRoleIdByRole(request.getRole());
+        if(request.getRole().equals("ADMIN")) throw new InvalidUserException("ERROR: Only admins can make other admins");
+
         //Creates a new user using the DTO request UUID.randomUUID generates a random id for user
         //User will be given the Default role of Employee, and isActive
         String hashedPassword = HashString.hashString(request.getPassword1());
         if(hashedPassword.equals(null)) throw new InvalidInputException("ERROR: Somehow the hashed password is blank");
+
         User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), request.getEmail(),
-            hashedPassword, request.getGivenName(), request.getSurname(), false , "e58ed763-928c-4155-bee9-fdbaaadc15f3"); //HASH PASSWORD HERE
+            hashedPassword, request.getGivenName(), request.getSurname(), false , roleId); //HASH PASSWORD HERE
         userDAO.save(createdUser);
     }
 
