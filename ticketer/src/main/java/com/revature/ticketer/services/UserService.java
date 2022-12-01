@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.UUID;
 
 import com.revature.ticketer.Exceptions.InvalidAuthException;
+import com.revature.ticketer.Exceptions.InvalidInputException;
 import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.daos.UserDAO;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
 import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.User;
+import com.revature.ticketer.utils.HashString;
 
 /*
  * Used to validate and retrieve data from the DAO
@@ -48,13 +50,17 @@ public class UserService {
 
         //Creates a new user using the DTO request UUID.randomUUID generates a random id for user
         //User will be given the Default role of Employee, and isActive
+        String hashedPassword = HashString.hashString(request.getPassword1());
+        if(hashedPassword.equals(null)) throw new InvalidInputException("ERROR: Somehow the hashed password is blank");
         User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), request.getEmail(),
-            request.getPassword1(), request.getGivenName(), request.getSurname(), false , "e58ed763-928c-4155-bee9-fdbaaadc15f3");
+            hashedPassword, request.getGivenName(), request.getSurname(), false , "e58ed763-928c-4155-bee9-fdbaaadc15f3"); //HASH PASSWORD HERE
         userDAO.save(createdUser);
     }
 
     public Principal login(NewLoginRequest req){
-        User validUser = userDAO.findUserByUserNameAndPassword(req.getUsername(),req.getPassword());
+        String hashedPassword = HashString.hashString(req.getPassword());
+        if(hashedPassword.equals(null)) throw new InvalidInputException("ERROR: Somehow the hashed password is blank");
+        User validUser = userDAO.findUserByUserNameAndPassword(req.getUsername(),hashedPassword); //HASH PASSWORD HERE
         if (validUser == null) throw new InvalidAuthException("ERROR: Invalid username or password");
         //Last spot is blank because we haven't actually generated an authToken yet.
         return new Principal (validUser.getId(), validUser.getUsername(), validUser.getRole_id());
@@ -76,11 +82,6 @@ public class UserService {
     //Checks to see if the email is valid
     private boolean isValidEmail(String email){
         return email.matches("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
-    }
-
-    //Encrypts a user's password prior to storing it on the database
-    private String hashPassword(String password){
-        return "";
     }
 
     public List<User> getAllUsers(){

@@ -57,7 +57,7 @@ public class UserHandler {
             if(token == null || token.isEmpty()) throw new InvalidAuthException("ERROR: You are not signed in");
             Principal principal = tokenService.extractRequesterDetails(token);
             if (principal == null) throw new InvalidAuthException("ERROR: Invalid Token");
-            //CURRENTLY NEED TO MANUALLY UPDATE THE AUTHORIZATION FIELD IN THE GET REQUEST FOR ALL USERS!
+
             if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
             List<User> users = userService.getAllUsers();
             c.json(users);

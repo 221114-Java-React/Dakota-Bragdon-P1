@@ -46,6 +46,10 @@ public class TicketHandler {
         }
     }
 
+    public void getAllTickets(Context c) throws IOException{
+        
+    }
+
     //Checks to make sure the token generated is valid
     //Currently only claims users are valid
     public boolean isValidToken(String token){
