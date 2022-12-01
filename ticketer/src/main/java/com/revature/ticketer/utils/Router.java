@@ -55,7 +55,8 @@ public class Router {
                 get(c -> userHandler.getAllUsers(c));
                 get("/name", c -> userHandler.getAllUsersByUsername(c));
                 //get("/role", c -> userHandler.getAllUsersByRole(c));//Will return a list of users ordered by role
-                post(c -> userHandler.signup(c));
+                post(c -> userHandler.signup(c)); //THIS CURRENTLY AUTOMATICALLY ASSIGNS A USER AS AN EMPLOYEE. ADD AN ADDITIONAL JSON FIELD TO ALLOW FOR A USER TO INPUT
+                                                    //EITHER EMPLOYEE OR MANAGER TO MEET THE NECESSARY REQUIREMENTS
                 //delete(c - userHandler.removeUser(c)); Will remove a user based on an id
                 path("/manageUsers", () -> { //THIS WILL REQUIRE ADMINISTRATIVE PRIVILEDGES
                     

@@ -47,6 +47,7 @@ public class UserDAO implements TemplateDAO<User>{
             ps.setString(1,username + "%");
             ResultSet rs = ps.executeQuery();
 
+            //CONSIDER OVERRWITING THIS CONSTRUCTOR TO OMIT DETAILS LIKE PASSWORD
             while(rs.next()){
                 User currentUser = new User(rs.getString("id"), rs.getString("username"), rs.getString("email"),
                 rs.getString("password"), rs.getString("given_name"), rs.getString("surname"),
@@ -115,7 +116,7 @@ public class UserDAO implements TemplateDAO<User>{
         return usernames;
     }
 
-    //Checks to see if a User/password combination is in the database
+    //Checks to see if a User/password combination is in the database and logs that user in if there is a match
     public User findUserByUserNameAndPassword(String username, String password){
         User user = null;
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
