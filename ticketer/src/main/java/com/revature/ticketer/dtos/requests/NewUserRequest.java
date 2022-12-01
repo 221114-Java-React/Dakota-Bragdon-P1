@@ -9,10 +9,13 @@ public class NewUserRequest{
     private String givenName;
     private String surname;
     private String role;
+    private boolean isActive;
 
     public NewUserRequest(){
         super();
     }
+
+    
 
     //Will prompt the user for these things. Consider removing isActive since that should be updated automatically
     public NewUserRequest(String username, String email, String password1, String password2, String givenName,
@@ -24,6 +27,12 @@ public class NewUserRequest{
         this.givenName = givenName;
         this.surname = surname;
         this.role = role;
+    }
+
+    //Used to change a user's active status;
+    public NewUserRequest(String username, boolean isActive) {
+        this.username = username;
+        this.isActive = isActive;
     }
 
     public String getUsername() {
@@ -82,10 +91,19 @@ public class NewUserRequest{
         this.role = role;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+    
     @Override
     public String toString() {
         return "NewUserRequest [username=" + username + ", email=" + email + ", password1=" + password1 + ", password2="
                 + password2 + ", givenName=" + givenName + ", surname=" + surname + ", role=" + role + "]";
     }
-    
 }

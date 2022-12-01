@@ -1,18 +1,30 @@
 package com.revature.ticketer.dtos.requests;
 
 public class NewTicketRequest {
+    private String id;
     private double amount;
     private String description;
     private String type;
+    private String status;
 
     public NewTicketRequest(){
         super();
+    }  
+
+    public NewTicketRequest(String id, String status) {
+        this.id = id;
+        this.status = status;
     }
 
     public NewTicketRequest( double amount, String description, String type) {
         this.amount = amount;
         this.description = description;
         this.type = type;
+    }
+
+    //Used by managers to resolve a ticket
+    public NewTicketRequest(String status) {
+        this.status = status;
     }
 
     public double getAmount() {
@@ -39,9 +51,26 @@ public class NewTicketRequest {
         this.type = type;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
-        return "NewTicketRequest [amount=" + amount + ", description=" + description + ", type=" + type + "]";
+        return "NewTicketRequest [id=" + id + ", amount=" + amount + ", description=" + description + ", type=" + type
+                + ", status=" + status + "]";
     }
     
 }

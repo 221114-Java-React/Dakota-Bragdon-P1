@@ -44,7 +44,6 @@ public class TicketDAO implements TemplateDAO<Ticket>{
             ps.setString(9, obj.getStatus());
             ps.setString(10, obj.getType());
             ps.executeUpdate();
-            System.out.println("Worked");
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -55,7 +54,29 @@ public class TicketDAO implements TemplateDAO<Ticket>{
         
     }
 
+    public Ticket resolve(Ticket obj){
+        Ticket resolvedTicket = new Ticket();
+        try(Connection con = ConnectionFactory.getInstance().getConnection()) {
+            //Updates the ticket
+            PreparedStatement ps = con.prepareStatement("UPDATE reimbursements (resolved, resolver_id, status_id) WHERE id =" + obj.getId());
+            ps.setTimestamp(1, obj.getResolveTime());
+            ps.setString(2, obj.getResolverId());
+            ps.setString(3, obj.getStatus());
 
+            //Gets the updated ticket NOT GOING TO UPDATE IT
+            /*PreparedStatement getTicket = con.prepareStatement("SELECT * FROM reimbursements WHERE id = " + obj.getId());
+            ResultSet rs = getTicket.executeQuery();
+            if (rs.next()) {
+                resolvedTicket = new Ticket()
+            }*/
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return resolvedTicket;
+    }
+
+    //Converts a type into its corresponding UUID
     public String getTypeIdByType(String type) {
         String typeId = "";
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
@@ -71,4 +92,22 @@ public class TicketDAO implements TemplateDAO<Ticket>{
         }
         return typeId;
     }
+
+    //Converts a status into its corresponding UUID
+    public String getStatusIdByType(String status) {
+        String statusId = "";
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT (id) FROM reimbursement_status WHERE type = ?");
+            ps.setString(1, status);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                statusId = rs.getString("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return statusId;
+    }
+
 }

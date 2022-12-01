@@ -3,6 +3,7 @@ package com.revature.ticketer.handlers;
 import java.io.IOException;
 import java.util.List;
 
+import org.omg.CORBA.DynAnyPackage.Invalid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.User;
 import com.revature.ticketer.services.TokenService;
 import com.revature.ticketer.services.UserService;
+import com.revature.ticketer.utils.CheckToken;
 
 import io.javalin.http.Context;
 
@@ -53,6 +55,7 @@ public class UserHandler {
     public void getAllUsers(Context c){
         try{ 
             String token = c.req.getHeader("authorization");//Generates String token from the Header of the Post Request
+            CheckToken.isValidAdminToken(token, tokenService);
             if(token == null || token.isEmpty()) throw new InvalidAuthException("ERROR: You are not signed in");
             Principal principal = tokenService.extractRequesterDetails(token);
             if (principal == null) throw new InvalidAuthException("ERROR: Invalid Token");
@@ -70,15 +73,26 @@ public class UserHandler {
         try{
             String username = c.req.getParameter("username");
             String token = c.req.getHeader("authorization"); 
-            if(token == null || token.isEmpty()) throw new InvalidAuthException("ERROR: You are not signed in");
-            if(username == null || username.isEmpty()) throw new InvalidInputException("ERROR: Invalid Input");//Prevents possible issues with a blank username
-            Principal principal = tokenService.extractRequesterDetails(token);
-            if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
+            if(CheckToken.isValidAdminToken(token, tokenService) && CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
+            //Principal principal = tokenService.extractRequesterDetails(token);
+            //if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
             List<User> users = userService.getAllUsersByUsername(username);
+            c.status(200);
             c.json(users);
         } catch (InvalidAuthException e){
             c.status(401);
             c.json(e);
+        }
+    }
+
+    public void validateUser(Context c) throws IOException{
+        NewUserRequest req = mapper.readValue(c.req.getInputStream(), NewUserRequest.class);
+        try {
+            String username = c.req.getParameter("username");
+            String token = c.req.getHeader("authorization"); 
+            CheckToken.isValidAdminToken(token, tokenService);
+        } catch (InvalidAuthException e){
+            e.printStackTrace();
         }
     }
 }

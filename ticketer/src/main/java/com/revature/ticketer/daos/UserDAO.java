@@ -28,8 +28,8 @@ public class UserDAO implements TemplateDAO<User>{
 
             while(rs.next()){
                 User currentUser = new User(rs.getString("id"), rs.getString("username"), rs.getString("email"),
-                rs.getString("password"), rs.getString("given_name"), rs.getString("surname"),
-                rs.getBoolean("is_active"), rs.getString("role_id"));
+                rs.getString("given_name"), rs.getString("surname"), rs.getBoolean("is_active"), 
+                rs.getString("role_id"));
                 users.add(currentUser);
             }
         } catch (SQLException e) {
@@ -47,11 +47,10 @@ public class UserDAO implements TemplateDAO<User>{
             ps.setString(1,username + "%");
             ResultSet rs = ps.executeQuery();
 
-            //CONSIDER OVERRWITING THIS CONSTRUCTOR TO OMIT DETAILS LIKE PASSWORD
             while(rs.next()){
                 User currentUser = new User(rs.getString("id"), rs.getString("username"), rs.getString("email"),
-                rs.getString("password"), rs.getString("given_name"), rs.getString("surname"),
-                rs.getBoolean("is_active"), rs.getString("role_id"));
+                rs.getString("given_name"), rs.getString("surname"), rs.getBoolean("is_active"), 
+                rs.getString("role_id"));
                 users.add(currentUser);
             }
         } catch (SQLException e) {
@@ -125,9 +124,9 @@ public class UserDAO implements TemplateDAO<User>{
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if(rs.next()) {
-                user = new User(rs.getString("id"), rs.getString("username"), rs.getString("email"),
-                rs.getString("password"), rs.getString("given_name"), rs.getString("surname"),
-                rs.getBoolean("is_active"), rs.getString("role_id"));
+                user = new User(rs.getString("id"), rs.getString("username"), rs.getString("email"), 
+                rs.getString("given_name"), rs.getString("surname"), rs.getBoolean("is_active"), 
+                rs.getString("role_id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

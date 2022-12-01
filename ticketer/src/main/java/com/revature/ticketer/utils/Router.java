@@ -3,6 +3,7 @@ package com.revature.ticketer.utils;
 import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
 import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.patch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.daos.TicketDAO;
@@ -52,16 +53,17 @@ public class Router {
             path("/users", () -> {
                 //Post takes in a context which points to a function body
                 //Turns a function into a variable
-                get(c -> userHandler.getAllUsers(c));
+                post(c -> userHandler.signup(c)); //Signs up a user as either an Employee or Manager
+
+                get(c -> userHandler.getAllUsers(c)); //This can only be performed by an admin
+                
                 get("/name", c -> userHandler.getAllUsersByUsername(c));
                 //get("/role", c -> userHandler.getAllUsersByRole(c));//Will return a list of users ordered by role
-                post(c -> userHandler.signup(c)); //THIS CURRENTLY AUTOMATICALLY ASSIGNS A USER AS AN EMPLOYEE. ADD AN ADDITIONAL JSON FIELD TO ALLOW FOR A USER TO INPUT
-                                                    //EITHER EMPLOYEE OR MANAGER TO MEET THE NECESSARY REQUIREMENTS
                 //delete(c - userHandler.removeUser(c)); Will remove a user based on an id
                 path("/manageUsers", () -> { //THIS WILL REQUIRE ADMINISTRATIVE PRIVILEDGES
                     
                     //get(c -> userHandler.getPendingUsers(c)); //Will return a list of users who aren't validated yet
-                    //post(c -> userHandler.validateUsers(c)) //
+                    patch("/name", c -> userHandler.validateUser(c)); //Will validate a user
 
                     //Try patching/putting the password
                 });
@@ -80,6 +82,7 @@ public class Router {
             path("/ticket", () -> {
                 get(c -> ticketHandler.getAllTickets(c)); //Returns all tickets
                 post(c -> ticketHandler.makeTicket(c));//Used to make tickets
+                patch("/id", c -> ticketHandler.resolveTicket(c)); //Resolves a pending ticket to be either approved or denied
 
                 //get("/user" -> ticketHandler.getUserTickets);//Returns all tickets for a user
 

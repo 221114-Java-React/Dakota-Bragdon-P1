@@ -36,7 +36,7 @@ public class TicketHandler {
             //WILL NEED TO CHECK IF USER IS_ACTIVE BEFORE MAKING A TICKET
             String token = c.req.getHeader("authorization");
             //This message is vague, maybe modify it
-            if(!CheckToken.isValidEmployeeToken(token,tokenService)) throw new InvalidAuthException("ERROR: You lack authorization");
+            CheckToken.isValidEmployeeToken(token, tokenService);
 
             ticketService.saveTicket(req);//Adds a ticket
             c.status(201);
@@ -55,40 +55,20 @@ public class TicketHandler {
 
     }
 
-    //Checks to make sure the token generated is valid
-    //Currently only claims users are valid
-    public boolean isValidEmployeeToken(String token){
+    public void resolveTicket(Context c) throws IOException{
 
-        if(isEmptyToken(token)) throw new InvalidAuthException("ERROR: You are not signed in");
-        Principal principal = tokenService.extractRequesterDetails(token);
-        if (principal == null) throw new InvalidAuthException("ERROR: Invalid Token");
-        if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f3")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
+        NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
+        try{
+            String token = c.req.getHeader("authorization");
+            CheckToken.isValidManagerToken(token, tokenService);
 
-        return true;
-    }
-
-    public boolean isValidManagerToken(String token){
-
-        if(isEmptyToken(token)) throw new InvalidAuthException("ERROR: You are not signed in");
-        Principal principal = tokenService.extractRequesterDetails(token);
-        if (principal == null) throw new InvalidAuthException("ERROR: Invalid Token");
-        if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f3")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
-
-        return true;
-    }
-
-    public boolean isValidAdminToken(String token){
-
-        if(isEmptyToken(token)) throw new InvalidAuthException("ERROR: You are not signed in");
-        Principal principal = tokenService.extractRequesterDetails(token);
-        if (principal == null) throw new InvalidAuthException("ERROR: Invalid Token");
-        if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f3")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
-
-        return true;
-    }
-
-    public boolean isEmptyToken(String token){
-        return (token == null || token.isEmpty()) ? true : false;
+            Ticket resolvedTicket = ticketService.resolveTicket(req);
+            c.status(200);
+            c.json(resolvedTicket);
+        } catch (InvalidAuthException e){
+            c.status(401);
+            c.json(e);
+        }
     }
 
 }

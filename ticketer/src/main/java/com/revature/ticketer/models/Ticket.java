@@ -39,6 +39,15 @@ public class Ticket {
         this.type = type;
     }
 
+    
+
+
+    public Ticket(String id, Timestamp resolveTime, String resolverId, String status) {
+        this.id = id;
+        this.resolveTime = resolveTime;
+        this.resolverId = resolverId;
+        this.status = status;
+    }
 
     public Ticket(String id, double amount, Timestamp sumbittedTime, Timestamp resolveTime, String description,
             String paymentId, String authorId, String resolverId, String status, String type) {

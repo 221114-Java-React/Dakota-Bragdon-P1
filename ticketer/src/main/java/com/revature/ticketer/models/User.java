@@ -28,6 +28,18 @@ public class User {
         this.role_id = role_id;
     }
 
+    //Used for listing when listing any user
+    public User(String id, String username, String email, String givenName, String surname, boolean isActive,
+            String role_id) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.givenName = givenName;
+        this.surname = surname;
+        this.isActive = isActive;
+        this.role_id = role_id;
+    }
+
 
     public String getId() {
         return id;

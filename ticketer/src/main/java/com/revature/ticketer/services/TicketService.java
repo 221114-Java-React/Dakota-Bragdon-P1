@@ -15,7 +15,6 @@ public class TicketService {
     }
 
     public void saveTicket(NewTicketRequest request){
-        //CHECK TO MAKE SURE TICKET IS VALID AND SET 1 TO BE THE TOKEN ID
 
         long now = System.currentTimeMillis();
         Timestamp makeTime = new Timestamp(now);
@@ -23,6 +22,14 @@ public class TicketService {
         String typeId = ticketDAO.getTypeIdByType(request.getType());
         Ticket createdTicket = new Ticket(UUID.randomUUID().toString(), request.getAmount(), makeTime, null, 
             request.getDescription(), null, "1", null, "b0ccfca2-6f8e-11ed-a1eb-0242ac120002", typeId);
-        ticketDAO.save(createdTicket);
+        ticketDAO.save(createdTicket); //CHANGE THE AUTHOR ID
+    }
+
+    public Ticket resolveTicket(NewTicketRequest request){
+        long now = System.currentTimeMillis();
+        Timestamp resolveTime = new Timestamp(now);
+        String status = ticketDAO.getStatusIdByType(request.getStatus());
+        Ticket resolvedTicket = new Ticket(request.getId(), resolveTime, "", status);
+        return ticketDAO.resolve(resolvedTicket);
     }
 }
