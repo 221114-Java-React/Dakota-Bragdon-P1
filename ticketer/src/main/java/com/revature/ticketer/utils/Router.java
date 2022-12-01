@@ -78,11 +78,15 @@ public class Router {
 
             //Ticket
             path("/ticket", () -> {
+                get(c -> ticketHandler.getAllTickets(c)); //Returns all tickets
                 post(c -> ticketHandler.makeTicket(c));//Used to make tickets
-                //modify tickets
-                //get("/user" -> ticketHandler.getUserTickets);//Returns an unordered list of tickets. Maybe add additional paths for sorting by type/amount/status (?)
-                //get("/amount", c -> ticketHandler.) //Returns a sorted list of tickets
-                //get("/")
+
+                //get("/user" -> ticketHandler.getUserTickets);//Returns all tickets for a user
+
+                path("pending", () -> {
+                    get(c -> ticketHandler.getPendingTickets(c));//Gets a list of all pending tickets
+                    //Maybe get a list for a specific user?
+                });
             });
 
         });

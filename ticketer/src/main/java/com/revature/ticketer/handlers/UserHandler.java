@@ -26,7 +26,6 @@ public class UserHandler {
     private final UserService userService;
     private final ObjectMapper mapper;
     private final TokenService tokenService;
-    private final static Logger logger = LoggerFactory.getLogger(User.class);
      
 
 

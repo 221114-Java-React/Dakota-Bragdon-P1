@@ -47,6 +47,4 @@ public class JwtConfig {
     public Key getSigningKey() {
         return signingKey;
     }
-
-    
 }
