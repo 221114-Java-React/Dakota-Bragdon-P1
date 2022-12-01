@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.revature.ticketer.Exceptions.InvalidAuthException;
-import com.revature.ticketer.Exceptions.InvalidInputException;
 import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.daos.UserDAO;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
@@ -54,7 +53,7 @@ public class UserService {
         //Creates a new user using the DTO request UUID.randomUUID generates a random id for user
         //User will be given the Default role of Employee, and isActive
         String hashedPassword = HashString.hashString(request.getPassword1());
-        if(hashedPassword.equals(null)) throw new InvalidInputException("ERROR: Somehow the hashed password is blank");
+        if(hashedPassword.equals(null)) throw new InvalidAuthException("ERROR: Somehow the hashed password is blank");
 
         User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), request.getEmail(),
             hashedPassword, request.getGivenName(), request.getSurname(), false , roleId); //HASH PASSWORD HERE
@@ -63,7 +62,7 @@ public class UserService {
 
     public Principal login(NewLoginRequest req){
         String hashedPassword = HashString.hashString(req.getPassword());
-        if(hashedPassword.equals(null)) throw new InvalidInputException("ERROR: Somehow the hashed password is blank");
+        if(hashedPassword.equals(null)) throw new InvalidAuthException("ERROR: Somehow the hashed password is blank");
         User validUser = userDAO.findUserByUserNameAndPassword(req.getUsername(),hashedPassword); //HASH PASSWORD HERE
         if (validUser == null) throw new InvalidAuthException("ERROR: Invalid username or password");
         //Last spot is blank because we haven't actually generated an authToken yet.
