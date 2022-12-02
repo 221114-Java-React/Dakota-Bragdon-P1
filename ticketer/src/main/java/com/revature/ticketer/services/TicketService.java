@@ -30,12 +30,15 @@ public class TicketService {
         long now = System.currentTimeMillis();
         Timestamp resolveTime = new Timestamp(now);
         String status = ticketDAO.getStatusIdByType(request.getStatus());
-        
         Ticket resolvedTicket = new Ticket(ticketId, resolveTime, resolverId, status);
         ticketDAO.resolve(resolvedTicket);
     }
 
     public List<Ticket> getAllTickets(){
         return ticketDAO.findAllTickets();
+    }
+
+    public Ticket getTicket(String id){
+        return ticketDAO.findById(id);
     }
 }

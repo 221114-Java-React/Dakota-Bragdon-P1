@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +24,23 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     }
 
     @Override
-    public Ticket findById() {
-        return null;
+    public Ticket findById(String id) {
+        Ticket ticket = new Ticket();
+        try(Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM reimbursements WHERE id = ?");
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                 ticket = new Ticket(rs.getString("id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                    rs.getTimestamp("resolved"), rs.getString("description"),
+                    rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                    rs.getString("status_id"), rs.getString("type_id"));
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return ticket;
     }
 
     @Override

@@ -14,7 +14,7 @@ public class HashString {
     
     public static String hashString(String wordToHash){
         Properties properties = new Properties();
-        String hashedString = "";
+        /*String hashedString = "";
         try {
             properties.load(new FileReader("src/main/resources/db.properties"));
         } catch (IOException e) {
@@ -30,7 +30,8 @@ public class HashString {
             
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-        }
-        return hashedString;
+        }*/
+        return wordToHash;
+        //return hashedString;
     }
 }

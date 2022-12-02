@@ -3,13 +3,9 @@ package com.revature.ticketer.handlers;
 import java.io.IOException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.dtos.requests.NewTicketRequest;
-import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.Ticket;
 import com.revature.ticketer.services.TicketService;
 import com.revature.ticketer.services.TokenService;
@@ -22,7 +18,6 @@ public class TicketHandler {
     private final TicketService ticketService;
     private final ObjectMapper mapper;
     private final TokenService tokenService;
-    private final static Logger logger = LoggerFactory.getLogger(Ticket.class);
     
     public TicketHandler(TicketService ticketService, ObjectMapper mapper, TokenService tokenService) {
         this.ticketService = ticketService;
@@ -73,11 +68,21 @@ public class TicketHandler {
 
     public void resolveTicket(Context c) throws IOException{
         NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
+
         try{
             String token = c.req.getHeader("authorization");
             String ticketId = c.req.getParameter("id");
             CheckToken.isValidManagerToken(token, tokenService);
             String resolverId = CheckToken.getOwner(token, tokenService);
+
+            //try {
+                Ticket ticket = ticketService.getTicket(ticketId);
+                if(!ticket.getStatus().equals("b0ccfca2-6f8e-11ed-a1eb-0242ac120002")) throw new InvalidAuthException("ERROR: Ticket has been finalized");
+                //Pretty scuffed right now. Will print out an Unauthorized Status code when it probably should be 400
+            //} catch (InvalidAuthException e){ 
+                //c.status(400);
+                //c.json(e);
+            //}
             ticketService.resolveTicket(req, ticketId, resolverId);
             c.status(202);
         } catch (InvalidAuthException e){

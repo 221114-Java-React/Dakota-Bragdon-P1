@@ -17,5 +17,5 @@ public interface TemplateDAO<T>{
     void delete(T obj);
     void update(T obj);
     List<T> findAll();
-    T findById();
+    T findById(String id);
 }

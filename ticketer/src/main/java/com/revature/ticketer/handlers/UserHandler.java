@@ -3,15 +3,11 @@ package com.revature.ticketer.handlers;
 import java.io.IOException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
-import com.revature.ticketer.Exceptions.InvalidInputException;
 import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
-import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.User;
 import com.revature.ticketer.services.TokenService;
 import com.revature.ticketer.services.UserService;
