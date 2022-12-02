@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidActionException;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
+import com.revature.ticketer.Exceptions.NotFoundException;
 import com.revature.ticketer.dtos.requests.NewTicketRequest;
 import com.revature.ticketer.models.Ticket;
 import com.revature.ticketer.services.TicketService;
@@ -28,11 +29,10 @@ public class TicketHandler {
 
     public void makeTicket(Context c) throws IOException{
 
+        //Saves a new ticket to the database
         NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
         try{
-            //WILL NEED TO CHECK IF USER IS_ACTIVE BEFORE MAKING A TICKET
             String token = c.req.getHeader("authorization");
-            //This message is vague, maybe modify it
             if(!CheckToken.isValidEmployeeToken(token, tokenService)) throw new InvalidAuthException("Only employees can make new tickets");
 
             ticketService.saveTicket(req);//Adds a ticket
@@ -44,30 +44,41 @@ public class TicketHandler {
         }
     }
 
-    //Mostly used for showing purposes
+    //Shows all the tickets in the database
     public void getAllTickets(Context c) throws IOException{
         try{
             String token = c.req.getHeader("authorization");
             if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can view all tickets");
             List<Ticket> tickets = ticketService.getAllTickets();
+
+            if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
+                c.json(tickets);
             c.json(tickets);
             c.status(200);
         } catch (InvalidAuthException e){
             c.status(401);
             c.json(e);
+        } catch (NotFoundException e){
+            c.status(404);
+            c.json(e);
         }
     }
 
+    //Returns a list of all pending tickets
     public void getPendingTickets(Context c) throws IOException{
         try{
             String token = c.req.getHeader("authorization");
             if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can view all pending tickets");
             //List<Ticket> tickets = ticketService.getAllPendingTickets(); //Returns the all the pending tickets for all users
+            //if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
             //c.json(tickets);
 
             c.status(200);
         } catch (InvalidAuthException e){
             c.status(401);
+            c.json(e);
+        } catch (NotFoundException e){
+            c.status(404);
             c.json(e);
         }
     }
@@ -83,7 +94,7 @@ public class TicketHandler {
 
             
             Ticket ticket = ticketService.getTicket(ticketId);
-            if(!ticket.getStatus().equals("b0ccfca2-6f8e-11ed-a1eb-0242ac120002")) throw new InvalidActionException("ERROR: Ticket has been finalized");
+            if(!ticket.getStatus().equals("b0ccfca2-6f8e-11ed-a1eb-0242ac120002")) throw new InvalidActionException("ERROR: Ticket has already been finalized");
                 //Pretty scuffed right now. Will print out an Unauthorized Status code when it probably should be 400
             ticketService.resolveTicket(req, ticketId, resolverId);
             c.status(202);
@@ -107,15 +118,19 @@ public class TicketHandler {
             String searcherId = CheckToken.getOwner(token, tokenService); //Gets the current user's ID, will be used for checking whether an employee is looking at their own ticket(s)
 
             String targetId = c.req.getParameter("id"); //Gets the target's ID
+
+            //Checks to make sure the token owner is other an employee or manager. This will determine the serviceHandler method called
             if(!CheckToken.isValidManagerToken(token, tokenService) && !CheckToken.isValidEmployeeToken(token, tokenService)) throw new InvalidAuthException("ERROR: Only Employees and Managers can view tickets");
-            //THIS SHOULD THROW A 401 STATUS CODE
+
             if(searcherId.equals(targetId)){//This means the employee is searching for their own tickets
                 List<Ticket> tickets = ticketService.getAllUserTickets(targetId); //Returns the tickets for a specific user
+                if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
                 c.json(tickets);
-            } else {
+            } else { //Means a manager is searching for other tickets
                 if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("ERROR: Only managers can view other user's tickets");
                 //validate to make sure the target's ID is in the database. Don't need to validate the current user since we already checked. DO THIS IN SERVICE
                 //List<Ticket> tickets = ticketService.getAllUserTickets(targetId); //Returns the tickets for all users
+                //if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
                 //c.json(tickets);
             }
 
@@ -125,6 +140,9 @@ public class TicketHandler {
             c.json(e);
         } catch (InvalidActionException e){
             c.status(403);
+            c.json(e);
+        } catch (NotFoundException e) {
+            c.status(404);
             c.json(e);
         }
     }

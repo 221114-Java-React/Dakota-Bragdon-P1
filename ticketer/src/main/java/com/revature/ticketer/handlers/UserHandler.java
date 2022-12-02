@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.Exceptions.InvalidUserException;
+import com.revature.ticketer.Exceptions.NotFoundException;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
 import com.revature.ticketer.models.User;
 import com.revature.ticketer.services.TokenService;
@@ -32,6 +33,7 @@ public class UserHandler {
         this.tokenService = tokenService;
     }
 
+    //Signs up a new user
     public void signup(Context c) throws IOException{
         //Returns the JSON request and maps it to NewUserRequest
         //This JSON request is the POST request made
@@ -47,6 +49,7 @@ public class UserHandler {
         }
     }
 
+    //Returns all users
     public void getAllUsers(Context c){
         try{ 
             String token = c.req.getHeader("authorization");//Generates String token from the Header of the Post Request
@@ -65,17 +68,21 @@ public class UserHandler {
             String username = c.req.getParameter("username");
             String token = c.req.getHeader("authorization"); 
             if(CheckToken.isValidAdminToken(token, tokenService) && CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
-            //Principal principal = tokenService.extractRequesterDetails(token);
-            //if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
             List<User> users = userService.getAllUsersByUsername(username);
+            if(users.isEmpty()) throw new NotFoundException("ERROR: No user(s) were found");
             c.status(200);
             c.json(users);
         } catch (InvalidAuthException e){
             c.status(401);
             c.json(e);
+        } catch (NotFoundException e){
+            c.status(404);
+            c.json(e);
         }
     }
 
+    //Validates the user
+    //CONSIDER ADDING A CHECK TO MAKE SURE THE USER EXISTS IN THE DATABASE!
     public void validateUser(Context c) throws IOException{
         NewUserRequest req = mapper.readValue(c.req.getInputStream(), NewUserRequest.class);
         try {

@@ -49,5 +49,4 @@ public class Principal {
         return "Principal [id=" + id + ", username=" + username + ", role=" + role + "]";
     }
     
-    
 }

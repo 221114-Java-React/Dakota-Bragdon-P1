@@ -32,9 +32,9 @@ public class AuthHandler {
         this.tokenService = tokenService;
     }
 
+    //Authenticates the user by generating a token from the principal
     public void authenticateUser(Context c) throws IOException {
         NewLoginRequest req = mapper.readValue(c.req.getInputStream(), NewLoginRequest.class);
-        //logger.info(req.toString()); Logs the New Login Request
         logger.info("Attempting to log in...");
         try{
             Principal principal = userService.login(req);
@@ -50,7 +50,7 @@ public class AuthHandler {
             logger.info("Log in successful");
             c.status(202);
         } catch (InvalidAuthException e){
-            c.status(401); //Invalid Authorization status code
+            c.status(401);
             c.json(e);
         }
     }

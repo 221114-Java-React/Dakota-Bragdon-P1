@@ -69,13 +69,13 @@ public class UserService {
         userDAO.validate(validatedUser);
     }
 
+    //Logs the user in by generating a principal
     public Principal login(NewLoginRequest req){
         String hashedPassword = HashString.hashString(req.getPassword());
         if(hashedPassword.equals(null)) throw new InvalidAuthException("ERROR: Somehow the hashed password is blank");
         User validUser = userDAO.findUserByUserNameAndPassword(req.getUsername(),hashedPassword); //HASH PASSWORD HERE
         if (validUser == null) throw new InvalidAuthException("ERROR: Invalid username or password");
         if(!validUser.isActive()) throw new InvalidAuthException("ERROR: You have not been granted permission. Ask your admin to verify you");
-        //Last spot is blank because we haven't actually generated an authToken yet.
         return new Principal (validUser.getId(), validUser.getUsername(), validUser.getRole_id());
     }
 
