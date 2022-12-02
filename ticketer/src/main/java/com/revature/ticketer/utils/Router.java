@@ -81,13 +81,18 @@ public class Router {
             path("/ticket", () -> {
                 get(c -> ticketHandler.getAllTickets(c)); //Returns all tickets
                 post(c -> ticketHandler.makeTicket(c));//Used to make tickets
-                patch("/id", c -> ticketHandler.resolveTicket(c)); //Resolves a pending ticket to be either approved or denied
+                
+                //Path to an individual employee's tickets
+                path("/user", () -> {
+                    //get(c -> ticketHandler.getEmployeeTickets(c)); //Returns all of an employee's tickets
+                    //put(c -> ticketHandler.updateEmployeeTicket(c)); //Allows an employee to update a ticket
 
-                //get("/user" -> ticketHandler.getUserTickets);//Returns all tickets for a user
+                });
 
+                //Handles pending tickets
                 path("pending", () -> {
                     get(c -> ticketHandler.getPendingTickets(c));//Gets a list of all pending tickets
-                    //Maybe get a list for a specific user?
+                    patch("/id", c -> ticketHandler.resolveTicket(c)); //Resolves a pending ticket to be either approved or denied
                 });
             });
 

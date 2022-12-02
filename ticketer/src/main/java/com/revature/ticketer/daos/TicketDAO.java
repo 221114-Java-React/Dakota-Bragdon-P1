@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.revature.ticketer.models.Ticket;
@@ -54,28 +55,42 @@ public class TicketDAO implements TemplateDAO<Ticket>{
         
     }
 
-    public Ticket resolve(Ticket obj){
-        Ticket resolvedTicket = new Ticket();
+    //Resolves a Ticket
+    public void resolve(Ticket obj){
+        
         try(Connection con = ConnectionFactory.getInstance().getConnection()) {
             //Updates the ticket
-            PreparedStatement ps = con.prepareStatement("UPDATE reimbursements (resolved, resolver_id, status_id) WHERE id = ? VALUES (?, ?, ?)");
-            ps.setString(1, obj.getId());
-            ps.setTimestamp(2, obj.getResolveTime());
-            ps.setString(3, obj.getResolverId());
-            ps.setString(4, obj.getStatus());
+            PreparedStatement ps = con.prepareStatement("UPDATE reimbursements SET resolved = ?, resolver_id = ?, status_id = ? WHERE id = ?");
+            ps.setTimestamp(1, obj.getResolveTime());
+            ps.setString(2, obj.getResolverId());
+            ps.setString(3, obj.getStatus());
+            ps.setString(4, obj.getId());
             ps.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-            //Gets the updated ticket NOT GOING TO UPDATE IT
-            /*PreparedStatement getTicket = con.prepareStatement("SELECT * FROM reimbursements WHERE id = " + obj.getId());
-            ResultSet rs = getTicket.executeQuery();
-            if (rs.next()) {
-                resolvedTicket = new Ticket()
-            }*/
+    //Returns all tickets
+    public List<Ticket> findAllTickets(){
+        List<Ticket> ticketList = new ArrayList<>();
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT * from reimbursements");
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                Ticket ticket = new Ticket(rs.getString("id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                    rs.getTimestamp("resolved"), rs.getString("description"),
+                    rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                    rs.getString("status_id"), rs.getString("type_id"));
+                ticketList.add(ticket);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return resolvedTicket;
+        return ticketList;
     }
 
     //Converts a type into its corresponding UUID
@@ -99,7 +114,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     public String getStatusIdByType(String status) {
         String statusId = "";
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
-            PreparedStatement ps = con.prepareStatement("SELECT (id) FROM reimbursement_status WHERE type = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT (id) FROM reimbursement_statuses WHERE status = ?");
             ps.setString(1, status);
             ResultSet rs = ps.executeQuery();
 

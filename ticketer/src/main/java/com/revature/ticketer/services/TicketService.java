@@ -1,6 +1,7 @@
 package com.revature.ticketer.services;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 import com.revature.ticketer.daos.TicketDAO;
@@ -25,11 +26,16 @@ public class TicketService {
         ticketDAO.save(createdTicket); //CHANGE THE AUTHOR ID
     }
 
-    public Ticket resolveTicket(NewTicketRequest request){
+    public void resolveTicket(NewTicketRequest request, String ticketId, String resolverId){
         long now = System.currentTimeMillis();
         Timestamp resolveTime = new Timestamp(now);
         String status = ticketDAO.getStatusIdByType(request.getStatus());
-        Ticket resolvedTicket = new Ticket(request.getId(), resolveTime, "", status);
-        return ticketDAO.resolve(resolvedTicket);
+        
+        Ticket resolvedTicket = new Ticket(ticketId, resolveTime, resolverId, status);
+        ticketDAO.resolve(resolvedTicket);
+    }
+
+    public List<Ticket> getAllTickets(){
+        return ticketDAO.findAllTickets();
     }
 }

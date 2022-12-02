@@ -1,6 +1,7 @@
 package com.revature.ticketer.handlers;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,24 +48,38 @@ public class TicketHandler {
         }
     }
 
+    //Mostly used for showing purposes
     public void getAllTickets(Context c) throws IOException{
-        
-    }
-
-    public void getPendingTickets(Context c) throws IOException{
-
-    }
-
-    public void resolveTicket(Context c) throws IOException{
-
-        NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
         try{
             String token = c.req.getHeader("authorization");
             CheckToken.isValidManagerToken(token, tokenService);
+            List<Ticket> tickets = ticketService.getAllTickets();
+            c.json(tickets);
+        } catch (InvalidAuthException e){
+            c.status(401);
+            c.json(e);
+        }
+    }
 
-            Ticket resolvedTicket = ticketService.resolveTicket(req);
-            c.status(200);
-            c.json(resolvedTicket);
+    public void getPendingTickets(Context c) throws IOException{
+        try{
+            String token = c.req.getHeader("authorization");
+            CheckToken.isValidManagerToken(token, tokenService);
+        } catch (InvalidAuthException e){
+            c.status(401);
+            c.json(e);
+        }
+    }
+
+    public void resolveTicket(Context c) throws IOException{
+        NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
+        try{
+            String token = c.req.getHeader("authorization");
+            String ticketId = c.req.getParameter("id");
+            CheckToken.isValidManagerToken(token, tokenService);
+            String resolverId = CheckToken.getOwner(token, tokenService);
+            ticketService.resolveTicket(req, ticketId, resolverId);
+            c.status(202);
         } catch (InvalidAuthException e){
             c.status(401);
             c.json(e);

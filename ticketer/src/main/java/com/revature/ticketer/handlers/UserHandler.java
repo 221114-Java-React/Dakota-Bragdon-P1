@@ -55,11 +55,6 @@ public class UserHandler {
         try{ 
             String token = c.req.getHeader("authorization");//Generates String token from the Header of the Post Request
             CheckToken.isValidAdminToken(token, tokenService);
-            if(token == null || token.isEmpty()) throw new InvalidAuthException("ERROR: You are not signed in");
-            Principal principal = tokenService.extractRequesterDetails(token);
-            if (principal == null) throw new InvalidAuthException("ERROR: Invalid Token");
-
-            if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) throw new InvalidAuthException("ERROR: You lack authorization to do this");
             List<User> users = userService.getAllUsers();
             c.json(users);
         } catch (InvalidAuthException e){

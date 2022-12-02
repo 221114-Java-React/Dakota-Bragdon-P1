@@ -151,7 +151,12 @@ public class Ticket {
         this.type = type;
     }
 
-    
-
+    @Override
+    public String toString() {
+        return "Ticket [id=" + id + ", amount=" + amount + ", sumbittedTime=" + sumbittedTime + ", resolveTime="
+                + resolveTime + ", description=" + description + ", receipt=" + receipt + ", paymentId=" + paymentId
+                + ", authorId=" + authorId + ", resolverId=" + resolverId + ", status=" + status + ", type=" + type
+                + "]";
+    }
     
 }
