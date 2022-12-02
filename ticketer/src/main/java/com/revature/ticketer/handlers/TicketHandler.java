@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.revature.ticketer.Exceptions.InvalidActionException;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.dtos.requests.NewTicketRequest;
 import com.revature.ticketer.models.Ticket;
@@ -80,18 +81,17 @@ public class TicketHandler {
             if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can resolve tickets");
             String resolverId = CheckToken.getOwner(token, tokenService);
 
-            //try {
-                Ticket ticket = ticketService.getTicket(ticketId);
-                if(!ticket.getStatus().equals("b0ccfca2-6f8e-11ed-a1eb-0242ac120002")) throw new InvalidAuthException("ERROR: Ticket has been finalized");
+            
+            Ticket ticket = ticketService.getTicket(ticketId);
+            if(!ticket.getStatus().equals("b0ccfca2-6f8e-11ed-a1eb-0242ac120002")) throw new InvalidActionException("ERROR: Ticket has been finalized");
                 //Pretty scuffed right now. Will print out an Unauthorized Status code when it probably should be 400
-            //} catch (InvalidAuthException e){ 
-                //c.status(400);
-                //c.json(e);
-            //}
             ticketService.resolveTicket(req, ticketId, resolverId);
             c.status(202);
         } catch (InvalidAuthException e){
             c.status(401);
+            c.json(e);
+        } catch (InvalidActionException e){
+            c.status(403);
             c.json(e);
         }
     }
@@ -107,14 +107,13 @@ public class TicketHandler {
             String searcherId = CheckToken.getOwner(token, tokenService); //Gets the current user's ID, will be used for checking whether an employee is looking at their own ticket(s)
 
             String targetId = c.req.getParameter("id"); //Gets the target's ID
-            if(!CheckToken.isValidManagerToken(token, tokenService) && !CheckToken.isValidEmployeeToken(token, tokenService)) throw new InvalidAuthException("Only Employees and Managers can view tickets");
+            if(!CheckToken.isValidManagerToken(token, tokenService) && !CheckToken.isValidEmployeeToken(token, tokenService)) throw new InvalidAuthException("ERROR: Only Employees and Managers can view tickets");
             //THIS SHOULD THROW A 401 STATUS CODE
-            System.out.println("targetId: "+targetId);
-            System.out.println("searchId: "+searcherId);
             if(searcherId.equals(targetId)){//This means the employee is searching for their own tickets
                 List<Ticket> tickets = ticketService.getAllUserTickets(targetId); //Returns the tickets for a specific user
                 c.json(tickets);
             } else {
+                if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("ERROR: Only managers can view other user's tickets");
                 //validate to make sure the target's ID is in the database. Don't need to validate the current user since we already checked. DO THIS IN SERVICE
                 //List<Ticket> tickets = ticketService.getAllUserTickets(targetId); //Returns the tickets for all users
                 //c.json(tickets);
@@ -122,7 +121,10 @@ public class TicketHandler {
 
             c.status(200);
         }  catch (InvalidAuthException e){
-            c.status(404);
+            c.status(401);
+            c.json(e);
+        } catch (InvalidActionException e){
+            c.status(403);
             c.json(e);
         }
     }
