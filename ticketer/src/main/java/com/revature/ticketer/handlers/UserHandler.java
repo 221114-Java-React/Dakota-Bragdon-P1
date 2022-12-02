@@ -3,7 +3,6 @@ package com.revature.ticketer.handlers;
 import java.io.IOException;
 import java.util.List;
 
-import org.omg.CORBA.DynAnyPackage.Invalid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +70,7 @@ public class UserHandler {
 
     public void getAllUsersByUsername(Context c){
         try{
+            //Gets the username from the URI
             String username = c.req.getParameter("username");
             String token = c.req.getHeader("authorization"); 
             if(CheckToken.isValidAdminToken(token, tokenService) && CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
@@ -91,6 +91,8 @@ public class UserHandler {
             String username = c.req.getParameter("username");
             String token = c.req.getHeader("authorization"); 
             CheckToken.isValidAdminToken(token, tokenService);
+            if(!CheckToken.isValidAdminToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
+            userService.validateUser(req, username);
         } catch (InvalidAuthException e){
             e.printStackTrace();
         }

@@ -58,10 +58,12 @@ public class TicketDAO implements TemplateDAO<Ticket>{
         Ticket resolvedTicket = new Ticket();
         try(Connection con = ConnectionFactory.getInstance().getConnection()) {
             //Updates the ticket
-            PreparedStatement ps = con.prepareStatement("UPDATE reimbursements (resolved, resolver_id, status_id) WHERE id =" + obj.getId());
-            ps.setTimestamp(1, obj.getResolveTime());
-            ps.setString(2, obj.getResolverId());
-            ps.setString(3, obj.getStatus());
+            PreparedStatement ps = con.prepareStatement("UPDATE reimbursements (resolved, resolver_id, status_id) WHERE id = ? VALUES (?, ?, ?)");
+            ps.setString(1, obj.getId());
+            ps.setTimestamp(2, obj.getResolveTime());
+            ps.setString(3, obj.getResolverId());
+            ps.setString(4, obj.getStatus());
+            ps.executeUpdate();
 
             //Gets the updated ticket NOT GOING TO UPDATE IT
             /*PreparedStatement getTicket = con.prepareStatement("SELECT * FROM reimbursements WHERE id = " + obj.getId());

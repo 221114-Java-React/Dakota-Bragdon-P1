@@ -40,6 +40,10 @@ public class User {
         this.role_id = role_id;
     }
 
+    public User(String username, boolean isActive) {
+        this.username = username;
+        this.isActive = isActive;
+    }
 
     public String getId() {
         return id;

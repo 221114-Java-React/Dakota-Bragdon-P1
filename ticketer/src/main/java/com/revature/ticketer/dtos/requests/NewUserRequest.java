@@ -30,8 +30,7 @@ public class NewUserRequest{
     }
 
     //Used to change a user's active status;
-    public NewUserRequest(String username, boolean isActive) {
-        this.username = username;
+    public NewUserRequest(boolean isActive) {
         this.isActive = isActive;
     }
 

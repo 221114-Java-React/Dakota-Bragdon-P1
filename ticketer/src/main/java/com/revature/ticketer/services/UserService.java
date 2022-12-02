@@ -60,6 +60,15 @@ public class UserService {
         userDAO.save(createdUser);
     }
 
+    //Validates (orinvalidates) username
+    public void validateUser(NewUserRequest request, String username){
+        List<String> usernames = userDAO.findAllUsernames(); //Need a list of usernames to ensure username is in list
+        if(!usernames.contains(username)) throw new InvalidUserException("ERROR: Username is not in the database");
+
+        User validatedUser = new User(username, request.isActive());
+        userDAO.validate(validatedUser);
+    }
+
     public Principal login(NewLoginRequest req){
         String hashedPassword = HashString.hashString(req.getPassword());
         if(hashedPassword.equals(null)) throw new InvalidAuthException("ERROR: Somehow the hashed password is blank");
@@ -95,4 +104,5 @@ public class UserService {
     public List<User> getAllUsersByUsername(String username){
         return userDAO.findUsersByUsername(username);
     }
+
 }

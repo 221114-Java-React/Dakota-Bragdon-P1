@@ -55,16 +55,15 @@ public class Router {
                 //Turns a function into a variable
                 post(c -> userHandler.signup(c)); //Signs up a user as either an Employee or Manager
 
-                get(c -> userHandler.getAllUsers(c)); //This can only be performed by an admin
+                get(c -> userHandler.getAllUsers(c)); //This can only be performed by admin
                 
                 get("/name", c -> userHandler.getAllUsersByUsername(c));
-                //get("/role", c -> userHandler.getAllUsersByRole(c));//Will return a list of users ordered by role
-                //delete(c - userHandler.removeUser(c)); Will remove a user based on an id
+
                 path("/manageUsers", () -> { //THIS WILL REQUIRE ADMINISTRATIVE PRIVILEDGES
                     
                     //get(c -> userHandler.getPendingUsers(c)); //Will return a list of users who aren't validated yet
                     patch("/name", c -> userHandler.validateUser(c)); //Will validate a user
-
+                    
                     //Try patching/putting the password
                 });
 

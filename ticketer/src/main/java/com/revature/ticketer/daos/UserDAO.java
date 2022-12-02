@@ -65,6 +65,18 @@ public class UserDAO implements TemplateDAO<User>{
         return null;
     }
 
+    public void validate(User obj){
+        try(Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("UPDATE users SET is_active = ? WHERE username = ?");
+            ps.setBoolean(1, obj.isActive());
+            ps.setString(2, obj.getUsername());
+            
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    } 
+
     @Override
     public void save(User obj) {
         //This block of code will be necessary every time we need a connection

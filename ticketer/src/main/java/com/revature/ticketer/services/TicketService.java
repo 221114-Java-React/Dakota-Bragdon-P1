@@ -21,7 +21,7 @@ public class TicketService {
         //GET CURRENT USER ID USING TOKEN
         String typeId = ticketDAO.getTypeIdByType(request.getType());
         Ticket createdTicket = new Ticket(UUID.randomUUID().toString(), request.getAmount(), makeTime, null, 
-            request.getDescription(), null, "1", null, "b0ccfca2-6f8e-11ed-a1eb-0242ac120002", typeId);
+            request.getDescription(), null, "1", null, "b0ccfca2-6f8e-11ed-a1eb-0242ac120002", typeId); //Set to PENDING status
         ticketDAO.save(createdTicket); //CHANGE THE AUTHOR ID
     }
 
