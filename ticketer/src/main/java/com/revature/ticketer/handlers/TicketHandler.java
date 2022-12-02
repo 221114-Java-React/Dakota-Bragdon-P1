@@ -101,17 +101,16 @@ public class TicketHandler {
      * to view a specific employee's tickets
      */
     public void getEmployeeTickets(Context c) throws IOException{
-        NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
-        
+
         try{
             String token = c.req.getHeader("authorization");
             String searcherId = CheckToken.getOwner(token, tokenService); //Gets the current user's ID, will be used for checking whether an employee is looking at their own ticket(s)
 
             String targetId = c.req.getParameter("id"); //Gets the target's ID
-            
-            if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only Employees and Managers can view tickets");
+            if(!CheckToken.isValidManagerToken(token, tokenService) && !CheckToken.isValidEmployeeToken(token, tokenService)) throw new InvalidAuthException("Only Employees and Managers can view tickets");
             //THIS SHOULD THROW A 401 STATUS CODE
-
+            System.out.println("targetId: "+targetId);
+            System.out.println("searchId: "+searcherId);
             if(searcherId.equals(targetId)){//This means the employee is searching for their own tickets
                 List<Ticket> tickets = ticketService.getAllUserTickets(targetId); //Returns the tickets for a specific user
                 c.json(tickets);
