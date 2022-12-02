@@ -4,6 +4,7 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.patch;
+import static io.javalin.apibuilder.ApiBuilder.put;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.daos.TicketDAO;
@@ -57,12 +58,13 @@ public class Router {
 
                 get(c -> userHandler.getAllUsers(c)); //This can only be performed by admin
                 
-                get("/name", c -> userHandler.getAllUsersByUsername(c));
+                get("/name", c -> userHandler.getAllUsersByUsername(c)); 
 
                 path("/manageUsers", () -> { //THIS WILL REQUIRE ADMINISTRATIVE PRIVILEDGES
                     
                     //get(c -> userHandler.getPendingUsers(c)); //Will return a list of users who aren't validated yet
                     patch("/name", c -> userHandler.validateUser(c)); //Will validate a user
+                    //put("/name", c -> userHandler.setPassword(c));
                     
                     //Try patching/putting the password
                 });
@@ -73,8 +75,6 @@ public class Router {
             path("/auth", () ->{
                 post(c -> authHandler.authenticateUser(c)); //Used to log the user in
                 //authHandler::authenticateUser This is an example of method reference and automatically passes the context
-                //delete(c -> userHandler.invalidateUser(c)) //Invalidates a user (sets is_Active to false) [CHECK IF THIS ISN'T ALREADY THE CASE]
-                //put(c -> userHandler.validateUser(c)) //Validates a user (sets is_Active to true) [CHECK IF THIS ISN'T ALREADY THE CASE]
             });
 
             //Ticket
@@ -84,7 +84,7 @@ public class Router {
                 
                 //Path to an individual employee's tickets
                 path("/user", () -> {
-                    //get(c -> ticketHandler.getEmployeeTickets(c)); //Returns all of an employee's tickets
+                    get(c -> ticketHandler.getEmployeeTickets(c)); //Returns all of an employee's tickets
                     //put(c -> ticketHandler.updateEmployeeTicket(c)); //Allows an employee to update a ticket
 
                 });

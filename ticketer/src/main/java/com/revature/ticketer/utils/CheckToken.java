@@ -35,11 +35,20 @@ public class CheckToken {
         return true;
     }
 
+    //Gets the Token's Owner's ID
     public static String getOwner(String token, TokenService tokenService){
         Principal principal = tokenService.extractRequesterDetails(token);
         String id = principal.getId();
         if (id == null || id.equals("")) return "";
         return id;
+    }
+
+    //Gets the Token's Owner's Role
+    public static String getOwnerRole(String token, TokenService tokenService){
+        Principal principal = tokenService.extractRequesterDetails(token);
+        String role = principal.getRole();
+        if (role == null || role.equals("")) return "";
+        return role;
     }
 
     public static boolean isEmptyToken(String token){

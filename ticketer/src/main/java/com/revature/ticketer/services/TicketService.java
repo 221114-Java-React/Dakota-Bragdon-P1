@@ -38,6 +38,11 @@ public class TicketService {
         return ticketDAO.findAllTickets();
     }
 
+    //Given a user ID, returns a list containing all of that user's tickets
+    public List<Ticket> getAllUserTickets(String id){
+        return ticketDAO.findAllUserTickets(id);
+    }
+
     public Ticket getTicket(String id){
         return ticketDAO.findById(id);
     }

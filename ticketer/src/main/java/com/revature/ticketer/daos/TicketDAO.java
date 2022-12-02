@@ -107,6 +107,27 @@ public class TicketDAO implements TemplateDAO<Ticket>{
         return ticketList;
     }
 
+    public List<Ticket> findAllUserTickets(String id){
+        List<Ticket> ticketList = new ArrayList<>();
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT * from reimbursements WHERE author_id = ?");
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                Ticket ticket = new Ticket(rs.getString("id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                    rs.getTimestamp("resolved"), rs.getString("description"),
+                    rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                    rs.getString("status_id"), rs.getString("type_id"));
+                ticketList.add(ticket);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return ticketList;
+    }
+
     //Converts a type into its corresponding UUID
     public String getTypeIdByType(String type) {
         String typeId = "";
