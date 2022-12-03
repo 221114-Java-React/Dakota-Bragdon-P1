@@ -38,8 +38,8 @@ public class TicketHandler {
         try{
             String token = c.req.getHeader("authorization");
             if(!CheckToken.isValidEmployeeToken(token, tokenService)) throw new InvalidAuthException("Only employees can make new tickets");
-
-            ticketService.saveTicket(req);//Adds a ticket
+            String ownerId = CheckToken.getOwner(token, tokenService);
+            ticketService.saveTicket(req, ownerId);//Adds a ticket
             logger.info("Successfully submitted a new ticket");
             c.status(201);        
         } catch (InvalidAuthException e) {
@@ -57,7 +57,6 @@ public class TicketHandler {
             if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can resolve tickets");
             String resolverId = CheckToken.getOwner(token, tokenService);
 
-            
             Ticket ticket = ticketService.getTicket(ticketId);
             if(!ticket.getStatus().equals("b0ccfca2-6f8e-11ed-a1eb-0242ac120002")) throw new InvalidActionException("ERROR: Ticket has already been finalized");
                 //Pretty scuffed right now. Will print out an Unauthorized Status code when it probably should be 400
@@ -108,6 +107,7 @@ public class TicketHandler {
             c.status(403);
             c.json(e);
         } catch (NotFoundException e) {
+            logger.info("No tickets found");
             c.status(404);
             c.json(e);
         }
@@ -118,15 +118,15 @@ public class TicketHandler {
         try{
             String token = c.req.getHeader("authorization");
             if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can view all pending tickets");
-            //List<Ticket> tickets = ticketService.getAllPendingTickets(); //Returns the all the pending tickets for all users
-            //if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
-            //c.json(tickets);
-
+            List<Ticket> tickets = ticketService.getAllPendingTickets(); //Returns the all the pending tickets for all users
+            if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
+            c.json(tickets);
             c.status(200);
         } catch (InvalidAuthException e){
             c.status(401);
             c.json(e);
         } catch (NotFoundException e){
+            logger.info("No tickets found");
             c.status(404);
             c.json(e);
         }
@@ -143,6 +143,7 @@ public class TicketHandler {
             c.status(401);
             c.json(e);
         } catch (NotFoundException e) {
+            logger.info("No tickets found");
             c.status(404);
             c.json(e);
         }
@@ -161,6 +162,7 @@ public class TicketHandler {
             c.status(401);
             c.json(e);
         } catch (NotFoundException e){
+            logger.info("No tickets found");
             c.status(404);
             c.json(e);
         }

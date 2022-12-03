@@ -85,9 +85,9 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     //Returns all tickets
     @Override
     public List<Ticket> findAll(){
-        List<Ticket> ticketList = new ArrayList<>();
+        List<Ticket> tickets = new ArrayList<>();
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
-            PreparedStatement ps = con.prepareStatement("SELECT * from reimbursements ORDER BY status_id, type_id, amount DESC");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM reimbursements ORDER BY status_id, type_id, amount DESC");
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
@@ -95,13 +95,34 @@ public class TicketDAO implements TemplateDAO<Ticket>{
                     rs.getTimestamp("resolved"), rs.getString("description"),
                     rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
                     rs.getString("status_id"), rs.getString("type_id"));
-                ticketList.add(ticket);
+                tickets.add(ticket);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return ticketList;
+        return tickets;
+    }
+
+    //Returns all pending tickets
+    public List<Ticket> findAllPendingTickets(String status){
+        List<Ticket> tickets = new ArrayList<>();
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM reimbursements WHERE status_id = ? ORDER BY author_id, type_id, amount DESC");
+            ps.setString(1,status);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                Ticket ticket = new Ticket(rs.getString("id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                    rs.getTimestamp("resolved"), rs.getString("description"),
+                    rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                    rs.getString("status_id"), rs.getString("type_id"));
+                tickets.add(ticket);
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return tickets;
     }
 
     //Finds all the tickets a manager has resolved
@@ -126,6 +147,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
         return tickets;
     }
 
+    //Gets all the tickets of a specific user
     public List<Ticket> findAllUserTickets(String id){
         List<Ticket> tickets = new ArrayList<>();
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
@@ -165,7 +187,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     }
 
     //Converts a status into its corresponding UUID
-    public String getStatusIdByType(String status) {
+    public String getStatusIdByStatus(String status) {
         String statusId = "";
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
             PreparedStatement ps = con.prepareStatement("SELECT (id) FROM reimbursement_statuses WHERE status = ?");
