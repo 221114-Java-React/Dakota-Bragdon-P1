@@ -106,6 +106,18 @@ public class UserDAO implements TemplateDAO<User>{
         
     }
 
+    //Sets a user's password based on their username
+    public void setUserPassword(String username, String password){
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("UPDATE users SET password = ? WHERE username = ?");
+            ps.setString(1, password);
+            ps.setString(2, username);
+            ps.executeUpdate(); //Slightly different method. SQL command MUST be either update/delete/insert
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
     //Returns a list of everyusername in the database
     public List<String> findAllUsernames(){
         List<String> usernames = new ArrayList<>();

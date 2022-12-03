@@ -3,11 +3,15 @@ package com.revature.ticketer.services;
 import java.util.List;
 import java.util.UUID;
 
+import org.omg.CORBA.DynAnyPackage.Invalid;
+
 import com.revature.ticketer.Exceptions.InvalidAuthException;
+import com.revature.ticketer.Exceptions.InvalidInputException;
 import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.daos.UserDAO;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
+import com.revature.ticketer.dtos.requests.UpdateUserRequest;
 import com.revature.ticketer.dtos.requests.ValidateNewUserRequest;
 import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.User;
@@ -41,27 +45,28 @@ public class UserService {
         //SPLIT THIS UP SO UNIT TESTING CAN BE PERFORMED (Also it's an eye sore)
         if(!isValidUsername(request.getUsername())) throw new InvalidUserException("ERROR: Username must be 8-20 characters long");
         if(usernames.contains(request.getUsername())) throw new InvalidUserException("ERROR: Username already exists");
-        if(!isValidPassword(request.getPassword1())) throw new InvalidUserException("ERROR: Passwords must be a minimum of 8 " + 
+        if(!isValidPassword(request.getPassword1())) throw new InvalidInputException("ERROR: Passwords must be a minimum of 8 " + 
         "characters, with at least one letter, one number, and one special character");
         if(!request.getPassword1().equals(request.getPassword2())) throw new InvalidUserException("ERROR: Passwords do not match");
         if(!isValidEmail(request.getEmail())) throw new InvalidUserException("ERROR: Invalid email");
         
         if(emails.contains(request.getEmail())) throw new InvalidUserException("ERROR: Email is already used");
 
+        //Allows for a user to input human text, rather than an incomprehensible UUID
         String roleId = userDAO.getRoleIdByRole(request.getRole());
-        if(request.getRole().equals("ADMIN")) throw new InvalidUserException("ERROR: Only admins can make other admins");
+        if(request.getRole().equals("ADMIN")) throw new InvalidAuthException("ERROR: Only admins can make other admins");
 
         //Creates a new user using the DTO request UUID.randomUUID generates a random id for user
         //User will be given the Default role of Employee, and isActive
         String hashedPassword = HashString.hashString(request.getPassword1());
-        if(hashedPassword.equals(null)) throw new InvalidAuthException("ERROR: Somehow the hashed password is blank");
 
+        //Creates a new user using the information they input, a UUID, and sets isActive to false
         User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), request.getEmail(),
-            hashedPassword, request.getGivenName(), request.getSurname(), false , roleId); //HASH PASSWORD HERE
+            hashedPassword, request.getGivenName(), request.getSurname(), false , roleId);
         userDAO.save(createdUser);
     }
 
-    //Validates (orinvalidates) username
+    //Validates (or invalidates) username
     public void validateUser(ValidateNewUserRequest request, String username){
         List<String> usernames = userDAO.findAllUsernames(); //Need a list of usernames to ensure username is in list
         if(!usernames.contains(username)) throw new InvalidUserException("ERROR: Username is not in the database");
@@ -73,11 +78,23 @@ public class UserService {
     //Logs the user in by generating a principal
     public Principal login(NewLoginRequest req){
         String hashedPassword = HashString.hashString(req.getPassword());
-        if(hashedPassword.equals(null)) throw new InvalidAuthException("ERROR: Somehow the hashed password is blank");
-        User validUser = userDAO.findUserByUserNameAndPassword(req.getUsername(),hashedPassword); //HASH PASSWORD HERE
+        User validUser = userDAO.findUserByUserNameAndPassword(req.getUsername(),hashedPassword);
         if (validUser == null) throw new InvalidAuthException("ERROR: Invalid username or password");
         if(!validUser.isActive()) throw new InvalidAuthException("ERROR: You have not been granted permission. Ask your admin to verify you");
         return new Principal (validUser.getId(), validUser.getUsername(), validUser.getRole_id());
+    }
+
+    //Sets a user's password (Admin changes a user password)
+    public void updateUserPassword(String username, UpdateUserRequest req){
+        if(!isValidPassword(req.getPassword())) throw new InvalidInputException("ERROR: Passwords must be a minimum of 8 " + 
+        "characters, with at least one letter, one number, and one special character");
+        String hashedPassword = HashString.hashString(req.getPassword());
+        userDAO.setUserPassword(username, hashedPassword);
+    }
+
+    //User updates their own password
+    public void updateUserPassword(){
+        
     }
 
     //Checks to see if the username is valid

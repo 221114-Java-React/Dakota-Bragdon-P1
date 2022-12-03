@@ -7,10 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
+import com.revature.ticketer.Exceptions.InvalidInputException;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
+import com.revature.ticketer.dtos.requests.UpdateUserRequest;
 import com.revature.ticketer.dtos.requests.ValidateNewUserRequest;
 import com.revature.ticketer.dtos.response.Principal;
-import com.revature.ticketer.models.User;
 import com.revature.ticketer.services.TokenService;
 import com.revature.ticketer.services.UserService;
 import com.revature.ticketer.utils.CheckToken;
@@ -26,7 +27,7 @@ public class AuthHandler {
     private final UserService userService;
     private final ObjectMapper mapper;
     private final TokenService tokenService;
-    private static final Logger logger = LoggerFactory.getLogger(User.class); //Logger is used to display information while debugging
+    private static final Logger logger = LoggerFactory.getLogger(AuthHandler.class); //Logger is used to display information while debugging
 
     public AuthHandler(UserService userService, ObjectMapper mapper, TokenService tokenService) {
         this.userService = userService;
@@ -64,7 +65,6 @@ public class AuthHandler {
         try {
             String username = c.req.getParameter("username");
             String token = c.req.getHeader("authorization"); 
-            CheckToken.isValidAdminToken(token, tokenService);
             if(!CheckToken.isValidAdminToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
             userService.validateUser(req, username);
         } catch (InvalidAuthException e){
@@ -72,5 +72,21 @@ public class AuthHandler {
         }
     }
 
+    //Allows for an admin to change a user's password
+    public void setUserPassword(Context c) throws IOException{
+        UpdateUserRequest req = mapper.readValue(c.req.getInputStream(), UpdateUserRequest.class);
+        try {
+            String username = c.req.getParameter("username");
+            String token = c.req.getHeader("authorization");
+            if(!CheckToken.isValidAdminToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
+            userService.updateUserPassword(username, req);
+        } catch (InvalidAuthException e){
+            c.status(401);
+            //e.printStackTrace();
+        } catch (InvalidInputException e){
+            c.status(401);
+            //e.printStackTrace();
+        }
+    }
     
 }

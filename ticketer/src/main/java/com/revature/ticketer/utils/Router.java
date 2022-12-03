@@ -4,7 +4,6 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.patch;
-import static io.javalin.apibuilder.ApiBuilder.put;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.daos.TicketDAO;
@@ -28,10 +27,7 @@ public class Router {
         JwtConfig jwtConfig = new JwtConfig();
         TokenService tokenService = new TokenService(jwtConfig);
 
-        /*
-         * Hierarchy of dependency injection
-         * UserDAO > UserService > UserHandler
-         */
+        //Setting Dependency injection based classes
         //Users
         UserDAO userDAO = new UserDAO();
         UserService userService = new UserService(userDAO);
@@ -47,37 +43,26 @@ public class Router {
 
         //User Handler Group
         //Goes Routes, userHandler, userService, userDAO
-        //A POST request would be an attempt at making a new user in this path. This is why userHandler's
-        //signup is called on c, which would be the passed data
         app.routes(() -> {
             //User
             path("/users", () -> {
-                //Post takes in a context which points to a function body
-                //Turns a function into a variable
+  
                 post(c -> userHandler.signup(c)); //Signs up a user as either an Employee or Manager
 
                 get(c -> userHandler.getAllUsers(c)); //This can only be performed by admin
                 
-                get("/name", c -> userHandler.getAllUsersByUsername(c)); 
-
-                path("/manageUsers", () -> { //THIS WILL REQUIRE ADMINISTRATIVE PRIVILEDGES
-                    
-                    //get(c -> userHandler.getPendingUsers(c)); //Will return a list of users who aren't validated yet
-                    
-                    //put("/name", c -> userHandler.setPassword(c));
-                    
-                    //Try patching/putting the password
-                });
+                get("/name", c -> userHandler.getAllUsersByUsername(c)); //Returns all users based on any matches that contain the query at the start of the username
 
             });
 
             //Auth
             path("/auth", () ->{
                 post(c -> authHandler.authenticateUser(c)); //Used to log the user in
+                //get(c -> userHandler.getPendingUsers(c)); //Will return a list of users who aren't validated yet
                 path("/validate", () ->{
                     patch("/name", c -> authHandler.validateUser(c)); //Will validate a user
                 });
-                //patch( c-> authHandler.setUserPassword(c)); //Will change a specific user's password
+                patch("/setpassword", c-> authHandler.setUserPassword(c)); //Will change a specific user's password
                 
             });
 

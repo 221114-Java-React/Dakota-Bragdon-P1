@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
+import com.revature.ticketer.Exceptions.InvalidInputException;
 import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.Exceptions.NotFoundException;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
@@ -41,10 +42,12 @@ public class UserHandler {
         //Attempts to save the new user to the database
         try{
             userService.saveUser(req);
-            c.status(201); //Created Status Code. Implies that a new user has been created
+            c.status(201); //Created Status Code
         } catch (InvalidUserException e){
-            c.status(409); //Conflict Status Code, meaning the user already exists
-            //Maybe have a child class for this exception so it is a little bit more specific and useful for logging
+            c.status(409); //Conflict Status Code
+            c.json(e);
+        } catch (InvalidAuthException e) {
+            c.status(401); //Unauthorized
             c.json(e);
         }
     }
@@ -52,7 +55,7 @@ public class UserHandler {
     //Returns all users
     public void getAllUsers(Context c){
         try{ 
-            String token = c.req.getHeader("authorization");//Generates String token from the Header of the Post Request
+            String token = c.req.getHeader("authorization");
             CheckToken.isValidAdminToken(token, tokenService);
             List<User> users = userService.getAllUsers();
             c.json(users);
@@ -66,6 +69,7 @@ public class UserHandler {
         try{
             //Gets the username from the URI
             String username = c.req.getParameter("username");
+            //Gets the token from the authorization header field
             String token = c.req.getHeader("authorization"); 
             if(CheckToken.isValidAdminToken(token, tokenService) && CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
             List<User> users = userService.getAllUsersByUsername(username);
@@ -78,21 +82,10 @@ public class UserHandler {
         } catch (NotFoundException e){
             c.status(404);
             c.json(e);
+        } catch (InvalidInputException e){
+            c.status(400);
+            c.json(e);
         }
     }
 
-    //Validates the user
-    //CONSIDER ADDING A CHECK TO MAKE SURE THE USER EXISTS IN THE DATABASE!
-    /*public void validateUser(Context c) throws IOException{
-        NewUserRequest req = mapper.readValue(c.req.getInputStream(), NewUserRequest.class);
-        try {
-            String username = c.req.getParameter("username");
-            String token = c.req.getHeader("authorization"); 
-            CheckToken.isValidAdminToken(token, tokenService);
-            if(!CheckToken.isValidAdminToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
-            userService.validateUser(req, username);
-        } catch (InvalidAuthException e){
-            e.printStackTrace();
-        }
-    }*/
 }

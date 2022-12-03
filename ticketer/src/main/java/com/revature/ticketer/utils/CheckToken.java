@@ -2,8 +2,11 @@ package com.revature.ticketer.utils;
 
 import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.services.TokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CheckToken {
+    private static final Logger logger = LoggerFactory.getLogger(CheckToken.class);
 
     //Checks for valid employee priviledges
     public static boolean isValidEmployeeToken(String token, TokenService tokenService){
@@ -11,7 +14,10 @@ public class CheckToken {
         if(isEmptyToken(token)) return false;
         Principal principal = tokenService.extractRequesterDetails(token);
         if (principal == null) return false;
-        if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f3")) return false;
+        if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f3")) {
+            logger.info("Token's owner is not a valid employee");
+            return false;
+        }
         return true;
     }
 
@@ -21,7 +27,10 @@ public class CheckToken {
         if(isEmptyToken(token)) return false;
         Principal principal = tokenService.extractRequesterDetails(token);
         if (principal == null) return false;
-        if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f4")) return false;
+        if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f4")) {
+            logger.info("Token's owner is not a valid manager");
+            return false;
+        }
         return true;
     }
 
@@ -31,7 +40,10 @@ public class CheckToken {
         if(isEmptyToken(token)) return false;
         Principal principal = tokenService.extractRequesterDetails(token);
         if (principal == null) return false;
-        if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) return false;
+        if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) {
+            logger.info("Token's owner is not a valid admin");
+            return false;
+        }
         return true;
     }
 
@@ -52,6 +64,11 @@ public class CheckToken {
     }
 
     public static boolean isEmptyToken(String token){
-        return (token == null || token.isEmpty()) ? true : false;
+        if (token == null || token.isEmpty()) {
+            logger.info("No token detected");
+            return true;  
+        } else {
+            return false;
+        }
     }
 }
