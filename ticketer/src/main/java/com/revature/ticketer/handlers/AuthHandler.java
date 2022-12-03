@@ -67,6 +67,8 @@ public class AuthHandler {
             String token = c.req.getHeader("authorization"); 
             if(!CheckToken.isValidAdminToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
             userService.validateUser(req, username);
+            logger.info("Validation Successful");
+            c.status(202);
         } catch (InvalidAuthException e){
             e.printStackTrace();
         }
@@ -80,12 +82,14 @@ public class AuthHandler {
             String token = c.req.getHeader("authorization");
             if(!CheckToken.isValidAdminToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
             userService.updateUserPassword(username, req);
+            logger.info("Password Change Successful");
+            c.status(202);
         } catch (InvalidAuthException e){
             c.status(401);
-            //e.printStackTrace();
+            e.printStackTrace();
         } catch (InvalidInputException e){
             c.status(401);
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
     

@@ -3,6 +3,9 @@ package com.revature.ticketer.handlers;
 import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidActionException;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
@@ -20,6 +23,7 @@ public class TicketHandler {
     private final TicketService ticketService;
     private final ObjectMapper mapper;
     private final TokenService tokenService;
+    private static final Logger logger = LoggerFactory.getLogger(TicketHandler.class);
     
     public TicketHandler(TicketService ticketService, ObjectMapper mapper, TokenService tokenService) {
         this.ticketService = ticketService;
@@ -36,49 +40,10 @@ public class TicketHandler {
             if(!CheckToken.isValidEmployeeToken(token, tokenService)) throw new InvalidAuthException("Only employees can make new tickets");
 
             ticketService.saveTicket(req);//Adds a ticket
-            c.status(201);
-
+            logger.info("Successfully submitted a new ticket");
+            c.status(201);        
         } catch (InvalidAuthException e) {
             c.status(401);
-            c.json(e);
-        }
-    }
-
-    //Shows all the tickets in the database
-    public void getAllTickets(Context c) throws IOException{
-        try{
-            String token = c.req.getHeader("authorization");
-            if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can view all tickets");
-            List<Ticket> tickets = ticketService.getAllTickets();
-
-            if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
-                c.json(tickets);
-            c.json(tickets);
-            c.status(200);
-        } catch (InvalidAuthException e){
-            c.status(401);
-            c.json(e);
-        } catch (NotFoundException e){
-            c.status(404);
-            c.json(e);
-        }
-    }
-
-    //Returns a list of all pending tickets
-    public void getPendingTickets(Context c) throws IOException{
-        try{
-            String token = c.req.getHeader("authorization");
-            if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can view all pending tickets");
-            //List<Ticket> tickets = ticketService.getAllPendingTickets(); //Returns the all the pending tickets for all users
-            //if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
-            //c.json(tickets);
-
-            c.status(200);
-        } catch (InvalidAuthException e){
-            c.status(401);
-            c.json(e);
-        } catch (NotFoundException e){
-            c.status(404);
             c.json(e);
         }
     }
@@ -97,6 +62,7 @@ public class TicketHandler {
             if(!ticket.getStatus().equals("b0ccfca2-6f8e-11ed-a1eb-0242ac120002")) throw new InvalidActionException("ERROR: Ticket has already been finalized");
                 //Pretty scuffed right now. Will print out an Unauthorized Status code when it probably should be 400
             ticketService.resolveTicket(req, ticketId, resolverId);
+            logger.info("Successfully resolved a ticket");
             c.status(202);
         } catch (InvalidAuthException e){
             c.status(401);
@@ -142,6 +108,59 @@ public class TicketHandler {
             c.status(403);
             c.json(e);
         } catch (NotFoundException e) {
+            c.status(404);
+            c.json(e);
+        }
+    }
+
+     //Returns a list of all pending tickets
+    public void getPendingTickets(Context c) throws IOException{
+        try{
+            String token = c.req.getHeader("authorization");
+            if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can view all pending tickets");
+            //List<Ticket> tickets = ticketService.getAllPendingTickets(); //Returns the all the pending tickets for all users
+            //if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
+            //c.json(tickets);
+
+            c.status(200);
+        } catch (InvalidAuthException e){
+            c.status(401);
+            c.json(e);
+        } catch (NotFoundException e){
+            c.status(404);
+            c.json(e);
+        }
+    }
+
+    public void getResolvedList(Context c) throws IOException{
+        try{
+            String token = c.req.getHeader("authorization");
+            if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can view all the tickets they have resolved");
+            List<Ticket> tickets = ticketService.getResolvedTickets(CheckToken.getOwner(token, tokenService));
+            if(tickets.isEmpty()) throw new NotFoundException("ERROR: This manager has not resolved any tickets");
+            c.json(tickets);
+        } catch (InvalidAuthException e){
+            c.status(401);
+            c.json(e);
+        } catch (NotFoundException e) {
+            c.status(404);
+            c.json(e);
+        }
+    }
+
+    //Shows all the tickets in the database
+    public void getAllTickets(Context c) throws IOException{
+        try{
+            String token = c.req.getHeader("authorization");
+            if(!CheckToken.isValidManagerToken(token, tokenService)) throw new InvalidAuthException("Only managers can view all tickets");
+            List<Ticket> tickets = ticketService.getAllTickets();
+            if(tickets.isEmpty()) throw new NotFoundException("ERROR: No ticket(s) were found");
+            c.json(tickets);
+            c.status(200);
+        } catch (InvalidAuthException e){
+            c.status(401);
+            c.json(e);
+        } catch (NotFoundException e){
             c.status(404);
             c.json(e);
         }

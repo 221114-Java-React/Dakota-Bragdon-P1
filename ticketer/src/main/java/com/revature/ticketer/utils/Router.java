@@ -84,8 +84,8 @@ public class Router {
                     patch("/id", c -> ticketHandler.resolveTicket(c)); //Resolves a pending ticket to be either approved or denied
                 });
 
-                path("/resolved_list", () -> {
-                    //get(c -> ticketHandler.getResolvedList()); //Returns a list of tickets a manager has resolved
+                path("/resolved", () -> {
+                    get(c -> ticketHandler.getResolvedList(c)); //Returns a list of tickets a manager has resolved
                 });
             });
 

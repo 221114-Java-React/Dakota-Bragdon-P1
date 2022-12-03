@@ -35,12 +35,16 @@ public class TicketService {
     }
 
     public List<Ticket> getAllTickets(){
-        return ticketDAO.findAllTickets();
+        return ticketDAO.findAll();
     }
 
     //Given a user ID, returns a list containing all of that user's tickets
     public List<Ticket> getAllUserTickets(String id){
         return ticketDAO.findAllUserTickets(id);
+    }
+
+    public List<Ticket> getResolvedTickets(String resolverId){
+        return ticketDAO.findAllResolvedTickets(resolverId);
     }
 
     public Ticket getTicket(String id){
