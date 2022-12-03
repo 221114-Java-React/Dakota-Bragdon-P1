@@ -29,11 +29,6 @@ public class NewUserRequest{
         this.role = role;
     }
 
-    //Used to change a user's active status;
-    public NewUserRequest(boolean isActive) {
-        this.isActive = isActive;
-    }
-
     public String getUsername() {
         return username;
     }

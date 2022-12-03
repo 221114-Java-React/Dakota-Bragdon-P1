@@ -63,7 +63,7 @@ public class Router {
                 path("/manageUsers", () -> { //THIS WILL REQUIRE ADMINISTRATIVE PRIVILEDGES
                     
                     //get(c -> userHandler.getPendingUsers(c)); //Will return a list of users who aren't validated yet
-                    patch("/name", c -> userHandler.validateUser(c)); //Will validate a user
+                    
                     //put("/name", c -> userHandler.setPassword(c));
                     
                     //Try patching/putting the password
@@ -74,7 +74,11 @@ public class Router {
             //Auth
             path("/auth", () ->{
                 post(c -> authHandler.authenticateUser(c)); //Used to log the user in
-                //authHandler::authenticateUser This is an example of method reference and automatically passes the context
+                path("/validate", () ->{
+                    patch("/name", c -> authHandler.validateUser(c)); //Will validate a user
+                });
+                //patch( c-> authHandler.setUserPassword(c)); //Will change a specific user's password
+                
             });
 
             //Ticket
@@ -85,7 +89,7 @@ public class Router {
                 //Path to an individual employee's tickets
                 path("/user", () -> {
                     get(c -> ticketHandler.getEmployeeTickets(c)); //Returns all of an employee's tickets
-                    //put(c -> ticketHandler.updateEmployeeTicket(c)); //Allows an employee to update a ticket
+                    //patch(c -> ticketHandler.updateEmployeeTicket(c)); //Allows an employee to update a ticket
 
                 });
 
@@ -93,6 +97,10 @@ public class Router {
                 path("pending", () -> {
                     get(c -> ticketHandler.getPendingTickets(c));//Gets a list of all pending tickets
                     patch("/id", c -> ticketHandler.resolveTicket(c)); //Resolves a pending ticket to be either approved or denied
+                });
+
+                path("/resolved_list", () -> {
+                    //get(c -> ticketHandler.getResolvedList()); //Returns a list of tickets a manager has resolved
                 });
             });
 

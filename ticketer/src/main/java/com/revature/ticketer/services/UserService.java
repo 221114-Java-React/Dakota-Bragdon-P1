@@ -8,6 +8,7 @@ import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.daos.UserDAO;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
+import com.revature.ticketer.dtos.requests.ValidateNewUserRequest;
 import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.User;
 import com.revature.ticketer.utils.HashString;
@@ -61,7 +62,7 @@ public class UserService {
     }
 
     //Validates (orinvalidates) username
-    public void validateUser(NewUserRequest request, String username){
+    public void validateUser(ValidateNewUserRequest request, String username){
         List<String> usernames = userDAO.findAllUsernames(); //Need a list of usernames to ensure username is in list
         if(!usernames.contains(username)) throw new InvalidUserException("ERROR: Username is not in the database");
 

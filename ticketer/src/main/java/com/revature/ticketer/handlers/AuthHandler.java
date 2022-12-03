@@ -8,10 +8,12 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
+import com.revature.ticketer.dtos.requests.ValidateNewUserRequest;
 import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.User;
 import com.revature.ticketer.services.TokenService;
 import com.revature.ticketer.services.UserService;
+import com.revature.ticketer.utils.CheckToken;
 
 import io.javalin.http.Context;
 
@@ -52,6 +54,21 @@ public class AuthHandler {
         } catch (InvalidAuthException e){
             c.status(401);
             c.json(e);
+        }
+    }
+
+    //Validates the user
+    //CONSIDER ADDING A CHECK TO MAKE SURE THE USER EXISTS IN THE DATABASE!
+    public void validateUser(Context c) throws IOException{
+        ValidateNewUserRequest req = mapper.readValue(c.req.getInputStream(), ValidateNewUserRequest.class);
+        try {
+            String username = c.req.getParameter("username");
+            String token = c.req.getHeader("authorization"); 
+            CheckToken.isValidAdminToken(token, tokenService);
+            if(!CheckToken.isValidAdminToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
+            userService.validateUser(req, username);
+        } catch (InvalidAuthException e){
+            e.printStackTrace();
         }
     }
 

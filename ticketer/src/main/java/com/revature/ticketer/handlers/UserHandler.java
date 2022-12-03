@@ -83,7 +83,7 @@ public class UserHandler {
 
     //Validates the user
     //CONSIDER ADDING A CHECK TO MAKE SURE THE USER EXISTS IN THE DATABASE!
-    public void validateUser(Context c) throws IOException{
+    /*public void validateUser(Context c) throws IOException{
         NewUserRequest req = mapper.readValue(c.req.getInputStream(), NewUserRequest.class);
         try {
             String username = c.req.getParameter("username");
@@ -94,5 +94,5 @@ public class UserHandler {
         } catch (InvalidAuthException e){
             e.printStackTrace();
         }
-    }
+    }*/
 }

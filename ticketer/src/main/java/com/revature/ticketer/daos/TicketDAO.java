@@ -24,6 +24,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     }
 
     @Override
+    //Finds a ticket based on an ID
     public Ticket findById(String id) {
         Ticket ticket = new Ticket();
         try(Connection con = ConnectionFactory.getInstance().getConnection()) {
@@ -90,7 +91,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     public List<Ticket> findAllTickets(){
         List<Ticket> ticketList = new ArrayList<>();
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
-            PreparedStatement ps = con.prepareStatement("SELECT * from reimbursements");
+            PreparedStatement ps = con.prepareStatement("SELECT * from reimbursements order by status, type_id, amount DESC");
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
@@ -110,7 +111,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     public List<Ticket> findAllUserTickets(String id){
         List<Ticket> ticketList = new ArrayList<>();
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
-            PreparedStatement ps = con.prepareStatement("SELECT * from reimbursements WHERE author_id = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT * from reimbursements WHERE author_id = ? order by status, type_id, amount DESC");
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
 

@@ -23,7 +23,7 @@ public class UserDAO implements TemplateDAO<User>{
         List<User> users = new ArrayList<>();
         try(Connection con = ConnectionFactory.getInstance().getConnection()) {
             //prepares an SQL command
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM users");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM users ORDER BY role_id, username");
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
@@ -43,7 +43,7 @@ public class UserDAO implements TemplateDAO<User>{
         List<User> users = new ArrayList<>();
         try(Connection con = ConnectionFactory.getInstance().getConnection()){
             //Returns a list of usernames similar to username parameter
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM users WHERE username LIKE ?");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM users WHERE username LIKE ? order by role_id");
             ps.setString(1,username + "%");
             ResultSet rs = ps.executeQuery();
 
