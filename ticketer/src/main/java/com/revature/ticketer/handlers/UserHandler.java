@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.Exceptions.InvalidInputException;
@@ -29,7 +30,7 @@ public class UserHandler {
     private final UserService userService;
     private final ObjectMapper mapper;
     private final TokenService tokenService;
-    private static final Logger logger = LoggerFactory.getLogger(TicketHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserHandler.class);
      
 
 
@@ -43,9 +44,8 @@ public class UserHandler {
     public void signup(Context c) throws IOException{
         //Returns the JSON request and maps it to NewUserRequest
         //This JSON request is the POST request made
-        NewUserRequest req = mapper.readValue(c.req.getInputStream(), NewUserRequest.class);
-
         try{
+            NewUserRequest req = mapper.readValue(c.req.getInputStream(), NewUserRequest.class);
             logger.info("Attempting to sign up");
             User createdUser = null;
             
@@ -77,6 +77,10 @@ public class UserHandler {
         } catch (InvalidAuthException e) {
             logger.info("Account creation failed");
             c.status(401); //Unauthorized
+            c.json(e);
+        } catch (JsonParseException e) {
+            logger.info("Malformed Input");
+            c.status(400);
             c.json(e);
         }
     }

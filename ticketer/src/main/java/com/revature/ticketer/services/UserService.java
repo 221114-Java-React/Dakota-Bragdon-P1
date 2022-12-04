@@ -112,4 +112,8 @@ public class UserService {
         return email.matches("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
     }
 
+    //Checks to see if the username is in the database
+    public String getIdfromUsername(String username){
+        return userDAO.findIdfromUsername(username);
+    }
 }

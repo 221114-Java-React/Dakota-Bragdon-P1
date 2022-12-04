@@ -190,6 +190,22 @@ public class UserDAO implements TemplateDAO<User>{
         return emails;
     }
 
+    //Checks to see if a username is in the database. Returns true if it does
+    public String findIdfromUsername(String username){
+        String id = "";
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT id FROM users WHERE username = ?");
+            ps.setString(1,username);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                id = rs.getString("id");
+            }          
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+
     //Allows the user to send input an all caps role, rather than the UUID
     public String getRoleIdByRole(String role) {
         String roleId = "";
@@ -206,4 +222,5 @@ public class UserDAO implements TemplateDAO<User>{
         }
         return roleId;
     }
+
 }

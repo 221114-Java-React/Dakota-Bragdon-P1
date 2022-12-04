@@ -15,7 +15,6 @@ public class CheckToken {
         Principal principal = tokenService.extractRequesterDetails(token);
         if (principal == null) return false;
         if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f3")) {
-            logger.info("Token's owner is not a valid employee");
             return false;
         }
         return true;
@@ -28,7 +27,6 @@ public class CheckToken {
         Principal principal = tokenService.extractRequesterDetails(token);
         if (principal == null) return false;
         if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f4")) {
-            logger.info("Token's owner is not a valid manager");
             return false;
         }
         return true;
@@ -41,7 +39,6 @@ public class CheckToken {
         Principal principal = tokenService.extractRequesterDetails(token);
         if (principal == null) return false;
         if(!principal.getRole().equals("e58ed763-928c-4155-bee9-fdbaaadc15f5")) {
-            logger.info("Token's owner is not a valid admin");
             return false;
         }
         return true;
@@ -53,6 +50,14 @@ public class CheckToken {
         String id = principal.getId();
         if (id == null || id.equals("")) return "";
         return id;
+    }
+
+    //Gets the Token's Owner's username
+    public static String getOwnerUsername(String token, TokenService tokenService){
+        Principal principal = tokenService.extractRequesterDetails(token);
+        String username = principal.getUsername();
+        if (username == null || username.equals("")) return "";
+        return username;
     }
 
     //Gets the Token's Owner's Role

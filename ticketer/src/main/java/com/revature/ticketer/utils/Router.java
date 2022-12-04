@@ -39,7 +39,7 @@ public class Router {
         //Tickets
         TicketDAO ticketDAO = new TicketDAO();
         TicketService ticketService = new TicketService(ticketDAO);
-        TicketHandler ticketHandler = new TicketHandler(ticketService, mapper, tokenService);
+        TicketHandler ticketHandler = new TicketHandler(ticketService, userService, mapper, tokenService);
 
         //User Handler Group
         //Goes Routes, userHandler, userService, userDAO

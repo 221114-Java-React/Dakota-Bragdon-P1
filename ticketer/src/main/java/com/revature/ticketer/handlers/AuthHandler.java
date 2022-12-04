@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.Exceptions.InvalidInputException;
@@ -67,8 +68,8 @@ public class AuthHandler {
     //Validates the user
     //CONSIDER ADDING A CHECK TO MAKE SURE THE USER EXISTS IN THE DATABASE!
     public void validateUser(Context c) throws IOException{
-        ValidateNewUserRequest req = mapper.readValue(c.req.getInputStream(), ValidateNewUserRequest.class);
         try {
+            ValidateNewUserRequest req = mapper.readValue(c.req.getInputStream(), ValidateNewUserRequest.class);
             String username = c.req.getParameter("username");
             String token = c.req.getHeader("authorization"); 
             if(CheckToken.isValidAdminToken(token, tokenService)){ 
@@ -84,14 +85,18 @@ public class AuthHandler {
         } catch (NotFoundException e){
             e.printStackTrace();
             c.status(404);
+        }  catch (JsonParseException e) {
+            logger.info("Malformed Input");
+            c.status(400);
+            c.json(e);
         }
     }
 
     //Allows for an admin to change a user's password
     public void setUserPassword(Context c) throws IOException{
-        User updatedUser = new User();
-        UpdateUserRequest req = mapper.readValue(c.req.getInputStream(), UpdateUserRequest.class);
+        User updatedUser = new User();    
         try {
+            UpdateUserRequest req = mapper.readValue(c.req.getInputStream(), UpdateUserRequest.class);
             String username = c.req.getParameter("username");
             String token = c.req.getHeader("authorization");
 
@@ -114,6 +119,10 @@ public class AuthHandler {
         } catch (InvalidInputException e){
             c.status(401);
             e.printStackTrace();
+        }   catch (JsonParseException e) {
+            logger.info("Malformed Input");
+            c.status(400);
+            c.json(e);
         }
     }
     

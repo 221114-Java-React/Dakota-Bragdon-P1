@@ -151,7 +151,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
     public List<Ticket> findAllUserTickets(String id){
         List<Ticket> tickets = new ArrayList<>();
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
-            PreparedStatement ps = con.prepareStatement("SELECT * from reimbursements WHERE author_id = ? order by status, type_id, amount DESC");
+            PreparedStatement ps = con.prepareStatement("SELECT * from reimbursements WHERE author_id = ? order by status_id, type_id, amount DESC");
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -168,6 +168,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
 
         return tickets;
     }
+    
 
     //Converts a type into its corresponding UUID
     public String getTypeIdByType(String type) {
@@ -202,5 +203,4 @@ public class TicketDAO implements TemplateDAO<Ticket>{
         }
         return statusId;
     }
-
 }
