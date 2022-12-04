@@ -3,3 +3,4 @@ ticketer/.vscode
 ticketer/.editorconfig
 .gitattributes
 ticketer/target
+ticketer/src/test
