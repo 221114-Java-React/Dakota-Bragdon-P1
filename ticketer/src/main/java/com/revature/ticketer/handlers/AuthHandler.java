@@ -8,13 +8,16 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
 import com.revature.ticketer.Exceptions.InvalidInputException;
+import com.revature.ticketer.Exceptions.NotFoundException;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
 import com.revature.ticketer.dtos.requests.UpdateUserRequest;
 import com.revature.ticketer.dtos.requests.ValidateNewUserRequest;
 import com.revature.ticketer.dtos.response.Principal;
+import com.revature.ticketer.models.User;
 import com.revature.ticketer.services.TokenService;
 import com.revature.ticketer.services.UserService;
 import com.revature.ticketer.utils.CheckToken;
+import com.revature.ticketer.utils.HashString;
 
 import io.javalin.http.Context;
 
@@ -40,6 +43,9 @@ public class AuthHandler {
         NewLoginRequest req = mapper.readValue(c.req.getInputStream(), NewLoginRequest.class);
         logger.info("Attempting to log in...");
         try{
+
+            String hashedPassword = HashString.hashString(req.getPassword());
+            req.setPassword(hashedPassword);
             Principal principal = userService.login(req);
 
             //Attempts to generate a token
@@ -65,24 +71,42 @@ public class AuthHandler {
         try {
             String username = c.req.getParameter("username");
             String token = c.req.getHeader("authorization"); 
-            if(!CheckToken.isValidAdminToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
-            userService.validateUser(req, username);
+            if(CheckToken.isValidAdminToken(token, tokenService)){ 
+                if(userService.isUsedUsername(username)){
+                    userService.validateUser(req, username);
+                } else throw new NotFoundException("ERROR: Username is not in the database");
+            } else throw new InvalidAuthException("ERROR: Invalid token");
             logger.info("Validation Successful");
             c.status(202);
         } catch (InvalidAuthException e){
             e.printStackTrace();
+            c.status(401);
+        } catch (NotFoundException e){
+            e.printStackTrace();
+            c.status(404);
         }
     }
 
     //Allows for an admin to change a user's password
     public void setUserPassword(Context c) throws IOException{
+        User updatedUser = new User();
         UpdateUserRequest req = mapper.readValue(c.req.getInputStream(), UpdateUserRequest.class);
         try {
             String username = c.req.getParameter("username");
             String token = c.req.getHeader("authorization");
-            if(!CheckToken.isValidAdminToken(token, tokenService)) throw new InvalidAuthException("ERROR: Invalid token");
-            userService.updateUserPassword(username, req);
+
+            //Checks to see if the token owner is an admin and if the password input is valid
+            if(CheckToken.isValidAdminToken(token, tokenService)) {
+                if(userService.isValidPassword(req.getPassword())) {
+                    System.out.println("In here");
+                    String hashedPassword = HashString.hashString(req.getPassword());
+                    req.setPassword(hashedPassword);
+                    updatedUser = userService.updateUserPassword(username, req);
+                } else throw new InvalidInputException("ERROR: Passwords must be a minimum of 8 characters, with at least one letter, one number, and one special character");    
+            }else throw new InvalidAuthException("ERROR: Invalid token");
+
             logger.info("Password Change Successful");
+            c.json(updatedUser);
             c.status(202);
         } catch (InvalidAuthException e){
             c.status(401);

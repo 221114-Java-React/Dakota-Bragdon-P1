@@ -3,11 +3,7 @@ package com.revature.ticketer.services;
 import java.util.List;
 import java.util.UUID;
 
-import org.omg.CORBA.DynAnyPackage.Invalid;
-
 import com.revature.ticketer.Exceptions.InvalidAuthException;
-import com.revature.ticketer.Exceptions.InvalidInputException;
-import com.revature.ticketer.Exceptions.InvalidUserException;
 import com.revature.ticketer.daos.UserDAO;
 import com.revature.ticketer.dtos.requests.NewLoginRequest;
 import com.revature.ticketer.dtos.requests.NewUserRequest;
@@ -15,7 +11,6 @@ import com.revature.ticketer.dtos.requests.UpdateUserRequest;
 import com.revature.ticketer.dtos.requests.ValidateNewUserRequest;
 import com.revature.ticketer.dtos.response.Principal;
 import com.revature.ticketer.models.User;
-import com.revature.ticketer.utils.HashString;
 
 /*
  * Used to validate and retrieve data from the DAO
@@ -37,82 +32,35 @@ public class UserService {
      * A DTO is sent instead of a POJO since there are some things you don't want
      * the user to send. Helps limit user control
      */
-    public void saveUser(NewUserRequest request){
-        List<String> usernames = userDAO.findAllUsernames();
-        List<String> emails = userDAO.findAllEmails();
-
-        //Used to ensure username, email, and password are all valid
-        //SPLIT THIS UP SO UNIT TESTING CAN BE PERFORMED (Also it's an eye sore)
-        if(!isValidUsername(request.getUsername())) throw new InvalidUserException("ERROR: Username must be 8-20 characters long");
-        if(usernames.contains(request.getUsername())) throw new InvalidUserException("ERROR: Username already exists");
-        if(!isValidPassword(request.getPassword1())) throw new InvalidInputException("ERROR: Passwords must be a minimum of 8 " + 
-        "characters, with at least one letter, one number, and one special character");
-        if(!request.getPassword1().equals(request.getPassword2())) throw new InvalidUserException("ERROR: Passwords do not match");
-        if(!isValidEmail(request.getEmail())) throw new InvalidUserException("ERROR: Invalid email");
-        
-        if(emails.contains(request.getEmail())) throw new InvalidUserException("ERROR: Email is already used");
+    public User saveUser(NewUserRequest req){
 
         //Allows for a user to input human text, rather than an incomprehensible UUID
-        String roleId = userDAO.getRoleIdByRole(request.getRole());
-        if(request.getRole().equals("ADMIN")) throw new InvalidAuthException("ERROR: Only admins can make other admins");
-
-        //Creates a new user using the DTO request UUID.randomUUID generates a random id for user
-        //User will be given the Default role of Employee, and isActive
-        String hashedPassword = HashString.hashString(request.getPassword1());
+        String roleId = userDAO.getRoleIdByRole(req.getRole());
 
         //Creates a new user using the information they input, a UUID, and sets isActive to false
-        User createdUser = new User(UUID.randomUUID().toString(), request.getUsername(), request.getEmail(),
-            hashedPassword, request.getGivenName(), request.getSurname(), false , roleId);
+        User createdUser = new User(UUID.randomUUID().toString(), req.getUsername(), req.getEmail(),
+            req.getPassword1(), req.getGivenName(), req.getSurname(), false , roleId);
         userDAO.save(createdUser);
+        return createdUser;
     }
 
     //Validates (or invalidates) username
     public void validateUser(ValidateNewUserRequest request, String username){
-        List<String> usernames = userDAO.findAllUsernames(); //Need a list of usernames to ensure username is in list
-        if(!usernames.contains(username)) throw new InvalidUserException("ERROR: Username is not in the database");
-
         User validatedUser = new User(username, request.isActive());
         userDAO.validate(validatedUser);
     }
 
     //Logs the user in by generating a principal
     public Principal login(NewLoginRequest req){
-        String hashedPassword = HashString.hashString(req.getPassword());
-        User validUser = userDAO.findUserByUserNameAndPassword(req.getUsername(),hashedPassword);
+        User validUser = userDAO.findUserByUserNameAndPassword(req.getUsername(),req.getPassword());
         if (validUser == null) throw new InvalidAuthException("ERROR: Invalid username or password");
         if(!validUser.isActive()) throw new InvalidAuthException("ERROR: You have not been granted permission. Ask your admin to verify you");
         return new Principal (validUser.getId(), validUser.getUsername(), validUser.getRole_id());
     }
 
     //Sets a user's password (Admin changes a user password)
-    public void updateUserPassword(String username, UpdateUserRequest req){
-        if(!isValidPassword(req.getPassword())) throw new InvalidInputException("ERROR: Passwords must be a minimum of 8 " + 
-        "characters, with at least one letter, one number, and one special character");
-        String hashedPassword = HashString.hashString(req.getPassword());
-        userDAO.setUserPassword(username, hashedPassword);
-    }
-
-    //User updates their own password
-    public void updateUserPassword(){
-        
-    }
-
-    //Checks to see if the username is valid
-    private boolean isValidUsername(String username) {
-        //Checks if the username is 8-20 are removes a lot of special characters
-        return username.matches("^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");
-    }
-
-    //Checks to see if the password is valid
-    private boolean isValidPassword(String password) {
-        //Checks to see if password is valid. Minimum of 8 characters, 1 letter, 1 num, 1 special char
-        //added an extra \ before the d's because of a compiler issue
-        return password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$");
-    }
-
-    //Checks to see if the email is valid
-    private boolean isValidEmail(String email){
-        return email.matches("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
+    public User updateUserPassword(String username, UpdateUserRequest req){
+        return userDAO.setUserPassword(username, req.getPassword());
     }
 
     public List<User> getAllUsers(){
@@ -121,6 +69,47 @@ public class UserService {
 
     public List<User> getAllUsersByUsername(String username){
         return userDAO.findUsersByUsername(username);
+    }
+
+    //User updates their own password
+    public void updateUserPassword(){
+        
+    }
+
+    //Checks to see if the username is valid. Must be 8-20 characters long
+    public boolean isValidUsername(String username) {
+        return username.matches("^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");
+    }
+
+    //Checks to see if password is valid. Minimum of 8 characters, 1 letter, 1 num, 1 special char
+    public boolean isValidPassword(String password) {
+        return password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$");
+    }
+
+    //Checks to see if the username is already in the database
+    public boolean isUsedUsername(String username){
+        List<String> usernames = userDAO.findAllUsernames();
+        return usernames.contains(username);
+    }
+
+    //Checks to see if the email is already in the database
+    public boolean isUsedEmail(String email){
+        List<String> emails = userDAO.findAllEmails();
+        return emails.contains(email);
+    }
+
+    //Checks to see if the two passwords are the same
+    public boolean isSamePassword(String password1, String password2){
+        return (password1.equals(password2));
+    }
+
+    public boolean isValidRole(String role){
+        return (role.equals("EMPLOYEE") || role.equals("MANAGER"));
+    }
+
+    //Checks to see if the email is valid
+    public boolean isValidEmail(String email){
+        return email.matches("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
     }
 
 }
