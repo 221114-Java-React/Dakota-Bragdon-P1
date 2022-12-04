@@ -16,7 +16,7 @@ public class TicketService {
     }
 
     //Passes a newly created ticket to the DAO
-    public void saveTicket(NewTicketRequest request, String ownerId){
+    public Ticket saveTicket(NewTicketRequest request, String ownerId){
 
         long now = System.currentTimeMillis();
         Timestamp makeTime = new Timestamp(now);
@@ -25,6 +25,7 @@ public class TicketService {
         Ticket createdTicket = new Ticket(UUID.randomUUID().toString(), request.getAmount(), makeTime, null, 
             request.getDescription(), null, ownerId, null, "b0ccfca2-6f8e-11ed-a1eb-0242ac120002", typeId); //Set to PENDING status
         ticketDAO.save(createdTicket);
+        return createdTicket;
     }
 
     public void resolveTicket(NewTicketRequest request, String ticketId, String resolverId){
@@ -35,12 +36,13 @@ public class TicketService {
         ticketDAO.resolve(resolvedTicket);
     }
 
-    //Updates the ticket. The string is necessary since it has to be updated
-    public void updateTicket(Ticket ticket, String type){
+    //Updates the ticket. The string is necessary since it can more easily be updated here
+    public Ticket updateTicket(Ticket ticket, String type){
         if(type != null) { //Updates the type if it is not null
             ticket.setType(ticketDAO.getTypeIdByType(type));
         }
         ticketDAO.update(ticket);
+        return ticket;
     }
 
     //Gets all the tickets in the database
@@ -68,4 +70,8 @@ public class TicketService {
         return ticketDAO.findById(id);
     }
 
+    //Checks to ensure the amount is not less than 0. NEEDS TO BE ABLE TO BE 0 FOR UPDATING PURPOSES
+    public boolean isValidAmount(double amount){
+        return (amount >= 0) ? true : false;
+    }
 }

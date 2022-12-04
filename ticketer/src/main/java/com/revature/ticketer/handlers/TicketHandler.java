@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ticketer.Exceptions.InvalidActionException;
 import com.revature.ticketer.Exceptions.InvalidAuthException;
+import com.revature.ticketer.Exceptions.InvalidInputException;
 import com.revature.ticketer.Exceptions.NotFoundException;
 import com.revature.ticketer.dtos.requests.NewTicketRequest;
 import com.revature.ticketer.models.Ticket;
@@ -38,16 +39,19 @@ public class TicketHandler {
     }
 
     //Saves a new ticket to the database
-    public void makeTicket(Context c) throws IOException{  
+    public void makeTicket(Context c) throws IOException{ 
+        Ticket ticket = new Ticket();
         try{
             NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
             String token = c.req.getHeader("authorization");
+            if(!ticketService.isValidAmount(req.getAmount())) throw new InvalidInputException("ERROR: Amount cannot be less than 0");
             if(CheckToken.isValidEmployeeToken(token, tokenService)) {
                 String ownerId = CheckToken.getOwner(token, tokenService);
-                ticketService.saveTicket(req, ownerId);//Adds a ticket
+                ticket = ticketService.saveTicket(req, ownerId);//Adds a ticket
             } else throw new InvalidAuthException("Only employees can make new tickets");
             
             logger.info("Successfully submitted a new ticket");
+            c.json(ticket);
             c.status(201);        
         } catch (InvalidAuthException e) {
             c.status(401);
@@ -56,11 +60,15 @@ public class TicketHandler {
             logger.info("Malformed Input");
             c.status(400);
             c.json(e);
+        } catch (InvalidInputException e){
+            c.status(400);
+            c.json(e);
         }
     }
 
     //Checks if the ticket exists before updating it
     public void updateTicket(Context c) throws IOException{
+        Ticket updatedTicket = new Ticket();
         try{
             NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
             String token = c.req.getHeader("authorization");
@@ -68,22 +76,27 @@ public class TicketHandler {
             //Checks if token is an employee token. Then checks the fields. If any are null, they will not be updated
             //(Type is updated in ticketService)
             if(CheckToken.isValidEmployeeToken(token, tokenService)) {
+                if(!ticketService.isValidAmount(req.getAmount())) throw new InvalidInputException("ERROR: Amount cannot be less than 0");
                 Ticket ticket = ticketService.getTicket(ticketId);
                 if(ticket != null) {
                     if(req.getDescription() != null) ticket.setDescription(req.getDescription());
                     if (req.getAmount() != 0) ticket.setAmount(req.getAmount());
                     String type = req.getType();
-                    ticketService.updateTicket(ticket, type);
+                    updatedTicket = ticketService.updateTicket(ticket, type);
                 } else throw new NotFoundException("ERROR: No ticket was found");
             } else throw new InvalidAuthException("Only employees update their tickets (EXCLUDING THE STATUS)");
 
             logger.info("Successfully updated the ticket");
+            c.json(updatedTicket);
             c.status(201);  
         } catch (InvalidAuthException e) {
             c.status(401);
             c.json(e);
         } catch (JsonParseException e) {
             logger.info("Malformed Input");
+            c.status(400);
+            c.json(e);
+        }  catch (InvalidInputException e){
             c.status(400);
             c.json(e);
         }

@@ -60,6 +60,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
         }
     }
 
+    //Updates a ticket
     @Override
     public void update(Ticket obj) {
         try(Connection con = ConnectionFactory.getInstance().getConnection()) {
@@ -68,7 +69,7 @@ public class TicketDAO implements TemplateDAO<Ticket>{
             ps.setString(2,obj.getDescription());
             ps.setString(3, obj.getType());
             ps.setString(4, obj.getId());
-            ps.executeUpdate();
+            ps.executeQuery();
         } catch (SQLException e){
             e.printStackTrace();
         }
