@@ -62,7 +62,16 @@ public class TicketDAO implements TemplateDAO<Ticket>{
 
     @Override
     public void update(Ticket obj) {
-        
+        try(Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("UPDATE reimbursements SET amount = ?, description = ?, type_id = ? WHERE id = ?");
+            ps.setDouble(1, obj.getAmount());
+            ps.setString(2,obj.getDescription());
+            ps.setString(3, obj.getType());
+            ps.setString(4, obj.getId());
+            ps.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     //Resolves a Ticket

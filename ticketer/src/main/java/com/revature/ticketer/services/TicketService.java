@@ -35,6 +35,15 @@ public class TicketService {
         ticketDAO.resolve(resolvedTicket);
     }
 
+    //Updates the ticket. The string is necessary since it has to be updated
+    public void updateTicket(Ticket ticket, String type){
+        if(type != null) { //Updates the type if it is not null
+            ticket.setType(ticketDAO.getTypeIdByType(type));
+        }
+        ticketDAO.update(ticket);
+    }
+
+    //Gets all the tickets in the database
     public List<Ticket> getAllTickets(){
         return ticketDAO.findAll();
     }
@@ -54,6 +63,7 @@ public class TicketService {
         return ticketDAO.findAllResolvedTickets(resolverId);
     }
 
+    //Gets a single ticket based on its id
     public Ticket getTicket(String id){
         return ticketDAO.findById(id);
     }

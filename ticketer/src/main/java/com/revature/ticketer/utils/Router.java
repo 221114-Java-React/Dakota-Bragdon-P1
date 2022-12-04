@@ -48,7 +48,6 @@ public class Router {
             path("/users", () -> {
   
                 post(c -> userHandler.signup(c)); //Signs up a user as either an Employee or Manager
-
                 get(c -> userHandler.getAllUsers(c)); //This can only be performed by admin
                 
                 get("/name", c -> userHandler.getAllUsersByUsername(c)); //Returns all users based on any matches that contain the query at the start of the username
@@ -74,8 +73,7 @@ public class Router {
                 //Path to an individual employee's tickets
                 path("/user", () -> {
                     get(c -> ticketHandler.getEmployeeTickets(c)); //Returns all of an employee's tickets
-                    //patch(c -> ticketHandler.updateEmployeeTicket(c)); //Allows an employee to update a ticket
-
+                    patch(c -> ticketHandler.updateTicket(c));//Allows an employee to update their ticket
                 });
 
                 //Handles pending tickets

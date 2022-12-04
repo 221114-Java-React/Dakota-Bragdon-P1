@@ -37,10 +37,8 @@ public class TicketHandler {
         this.tokenService = tokenService;
     }
 
-    public void makeTicket(Context c) throws IOException{
-
-        //Saves a new ticket to the database
-        
+    //Saves a new ticket to the database
+    public void makeTicket(Context c) throws IOException{  
         try{
             NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
             String token = c.req.getHeader("authorization");
@@ -61,6 +59,37 @@ public class TicketHandler {
         }
     }
 
+    //Checks if the ticket exists before updating it
+    public void updateTicket(Context c) throws IOException{
+        try{
+            NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
+            String token = c.req.getHeader("authorization");
+            String ticketId = c.req.getParameter("id");
+            //Checks if token is an employee token. Then checks the fields. If any are null, they will not be updated
+            //(Type is updated in ticketService)
+            if(CheckToken.isValidEmployeeToken(token, tokenService)) {
+                Ticket ticket = ticketService.getTicket(ticketId);
+                if(ticket != null) {
+                    if(req.getDescription() != null) ticket.setDescription(req.getDescription());
+                    if (req.getAmount() != 0) ticket.setAmount(req.getAmount());
+                    String type = req.getType();
+                    ticketService.updateTicket(ticket, type);
+                } else throw new NotFoundException("ERROR: No ticket was found");
+            } else throw new InvalidAuthException("Only employees update their tickets (EXCLUDING THE STATUS)");
+
+            logger.info("Successfully updated the ticket");
+            c.status(201);  
+        } catch (InvalidAuthException e) {
+            c.status(401);
+            c.json(e);
+        } catch (JsonParseException e) {
+            logger.info("Malformed Input");
+            c.status(400);
+            c.json(e);
+        }
+    }
+
+    //Resolves a ticket
     public void resolveTicket(Context c) throws IOException{
         try{
             NewTicketRequest req = mapper.readValue(c.req.getInputStream(), NewTicketRequest.class);
@@ -70,7 +99,8 @@ public class TicketHandler {
             String resolverId = CheckToken.getOwner(token, tokenService);
 
             Ticket ticket = ticketService.getTicket(ticketId);
-            if(ticket == null)
+            if(ticket == null) throw new NotFoundException("ERROR: No ticket was found");
+            //Hardcoded this. Not the best practice. IF TIME ALLOWS COME BACK TO RESOLVE THIS
             if(!ticket.getStatus().equals("b0ccfca2-6f8e-11ed-a1eb-0242ac120002")) throw new InvalidActionException("ERROR: Ticket has already been finalized");
             ticketService.resolveTicket(req, ticketId, resolverId);
             logger.info("Successfully resolved a ticket");
@@ -84,6 +114,9 @@ public class TicketHandler {
         } catch (JsonParseException e) {
             logger.info("Malformed Input");
             c.status(400);
+            c.json(e);
+        } catch (NotFoundException e) {
+            c.status(404);
             c.json(e);
         }
     }
@@ -110,7 +143,6 @@ public class TicketHandler {
                     String id = userService.getIdfromUsername(targetUsername);
                     if (!id.equals("")) {
                         if(CheckToken.isValidManagerToken(token, tokenService)) {
-                            System.out.println("FOUND A VALID USER"); 
                             tickets = ticketService.getAllUserTickets(id); //Returns the tickets for all users
                         } else throw new InvalidAuthException("ERROR: Only managers can view other user's tickets");
                     } else throw new NotFoundException("ERROR: Target username is not in the database");  
