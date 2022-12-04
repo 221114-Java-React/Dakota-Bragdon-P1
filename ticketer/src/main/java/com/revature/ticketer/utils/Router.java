@@ -22,6 +22,7 @@ import io.javalin.Javalin;
  */
 public class Router {
 
+    //Used to set paths various HTTP requests can be sent to
     public static void router(Javalin app){
         ObjectMapper mapper = new ObjectMapper();
         JwtConfig jwtConfig = new JwtConfig();
@@ -41,8 +42,7 @@ public class Router {
         TicketService ticketService = new TicketService(ticketDAO);
         TicketHandler ticketHandler = new TicketHandler(ticketService, userService, mapper, tokenService);
 
-        //User Handler Group
-        //Goes Routes, userHandler, userService, userDAO
+        //Routes to various paths
         app.routes(() -> {
             //User
             path("/users", () -> {

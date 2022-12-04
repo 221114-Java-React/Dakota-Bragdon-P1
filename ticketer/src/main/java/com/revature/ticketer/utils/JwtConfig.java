@@ -31,7 +31,7 @@ public class JwtConfig {
             e.printStackTrace();
         }
 
-        //Hashing the key with a salt generator. This salt will be stored in db properties
+        //Hashing the key with a salt generator
         byte[] saltyBytes = DatatypeConverter.parseBase64Binary(properties.getProperty("salt"));
         signingKey = new SecretKeySpec(saltyBytes, sigAlg.getJcaName());
     }
