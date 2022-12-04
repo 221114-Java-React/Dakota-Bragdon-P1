@@ -1,5 +1,5 @@
 ticketer/src/main/resources/db.properties
-ticketer/target
 ticketer/.vscode
 ticketer/.editorconfig
 .gitattributes
+ticketer/target
