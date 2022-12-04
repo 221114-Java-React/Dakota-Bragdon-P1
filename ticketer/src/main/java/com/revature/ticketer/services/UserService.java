@@ -71,11 +71,6 @@ public class UserService {
         return userDAO.findUsersByUsername(username);
     }
 
-    //User updates their own password
-    public void updateUserPassword(){
-        
-    }
-
     //Checks to see if the username is valid. Must be 8-20 characters long
     public boolean isValidUsername(String username) {
         return username.matches("^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");
