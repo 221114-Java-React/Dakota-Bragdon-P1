@@ -79,6 +79,7 @@ public class TicketHandler {
                 if(!ticketService.isValidAmount(req.getAmount())) throw new InvalidInputException("ERROR: Amount cannot be less than 0");
                 Ticket ticket = ticketService.getTicket(ticketId);
                 if(ticket != null) {
+                    if(!ticket.getStatus().equals("b0ccfca2-6f8e-11ed-a1eb-0242ac120002")) throw new InvalidActionException("ERROR: Ticket has already been finalized");
                     if(req.getDescription() != null) ticket.setDescription(req.getDescription());
                     if (req.getAmount() != 0) ticket.setAmount(req.getAmount());
                     String type = req.getType();
@@ -98,6 +99,9 @@ public class TicketHandler {
             c.json(e);
         }  catch (InvalidInputException e){
             c.status(400);
+            c.json(e);
+        } catch (InvalidActionException e){
+            c.status(403);
             c.json(e);
         }
     }
